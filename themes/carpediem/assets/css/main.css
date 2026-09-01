@@ -245,8 +245,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero__bolt {
 	position: absolute;
 	top: -4%;
-	width: clamp(90px, 12vw, 160px);
-	height: 82%;
+	width: clamp(70px, 9vw, 130px);
+	height: 84%;
 	opacity: .42;
 	filter: drop-shadow(0 0 16px rgba(205, 220, 255, .5));
 }

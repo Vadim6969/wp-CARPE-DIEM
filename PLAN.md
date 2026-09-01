@@ -172,12 +172,12 @@ wp-content/themes/carpediem/
 
 ## 5. Фазы работ
 
-### Фаза 1 — фундамент (полдня)
-- [ ] `.wp-env.json`, `npx wp-env start`, WP на `localhost:8888`, локаль `ru_RU`
-- [ ] Установка WooCommerce, мастер настройки (валюта RUB, страна RU, единицы)
-- [ ] Каркас темы `carpediem` (style.css, functions.php, index/header/footer/page/404), активация
-- [ ] `add_theme_support('woocommerce')` + галерея (zoom, lightbox, slider), размеры картинок
-- [ ] `git init`, `.gitignore` (в репозиторий — только `wp-content/themes/carpediem`, `.wp-env.json`, `PLAN.md`)
+### Фаза 1 — фундамент (полдня) ✅ сделано
+- [x] `.wp-env.json`, `npx wp-env start`, WP на `localhost:8888`, локаль `ru_RU`
+- [x] Установка WooCommerce, мастер настройки (валюта RUB, страна RU, единицы)
+- [x] Каркас темы `carpediem` (style.css, functions.php, index/header/footer/page/404), активация
+- [x] `add_theme_support('woocommerce')` + галерея (zoom, lightbox, slider), размеры картинок
+- [x] `git init`, `.gitignore` (в репозиторий — только `wp-content/themes/carpediem`, `.wp-env.json`, `PLAN.md`)
 
 **Проверка фазы:** сайт открывается, страница товара из демо-данных Woo рендерится в теме без фаталов.
 

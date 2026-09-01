@@ -43,6 +43,14 @@ add_action( 'wp_head', function () {
 	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
 }, 1 );
 
+// Скрипты эмодзи WP на этом сайте не нужны — минус два запроса на каждой странице.
+add_action( 'init', function () {
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+} );
+
 // Количество товаров в корзине для шапки (обновляется AJAX-фрагментами Woo).
 add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 	ob_start();
@@ -54,6 +62,7 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 
 require get_theme_file_path( 'inc/woo.php' );
 require get_theme_file_path( 'inc/one-click.php' );
+require get_theme_file_path( 'inc/seo.php' );
 
 /**
  * Версия ассета = время последней правки файла.

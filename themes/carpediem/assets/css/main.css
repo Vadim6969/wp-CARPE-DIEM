@@ -1177,3 +1177,14 @@ select.is-swatched { display: none; }
 .woocommerce-message li::before,
 .woocommerce-error li::before { display: none; }
 .woocommerce-error { list-style: none; }
+
+/* ---------- 404 ---------- */
+.error-404 { text-align: center; padding-block: calc(var(--step) * 6); }
+.error-404__cross { display: block; font-size: 28px; color: #2c2c33; }
+.error-404__code { font-size: clamp(56px, 12vw, 120px); letter-spacing: .2em; margin: calc(var(--step) * 2) 0 0 .2em; }
+.error-404__text { margin-top: calc(var(--step) * 2); color: var(--text-dim); }
+.error-404__actions { display: flex; flex-wrap: wrap; gap: var(--step); justify-content: center; margin-top: calc(var(--step) * 4); }
+
+/* Списки в текстовых страницах */
+.entry-content ul, .entry-content ol { padding-left: 22px; }
+.entry-content li + li { margin-top: 6px; }

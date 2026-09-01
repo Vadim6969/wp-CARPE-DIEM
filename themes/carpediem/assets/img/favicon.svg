@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+	<rect width="512" height="512" fill="#050505"/>
+	<g stroke="#d9d4cc" stroke-width="10" fill="none" stroke-linecap="square">
+		<path d="M256 40 274 70 256 100 238 70z"/>
+		<path d="M256 100v312"/>
+		<path d="M256 472l-18-30 18-30 18 30z"/>
+		<path d="M150 150h212"/>
+	</g>
+	<text x="256" y="330" fill="#e8e6e3" font-family="Georgia, 'Times New Roman', serif" font-size="230" text-anchor="middle" letter-spacing="-20">CD</text>
+</svg>

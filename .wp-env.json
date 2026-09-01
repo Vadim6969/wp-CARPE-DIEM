@@ -1,0 +1,11 @@
+{
+  "core": null,
+  "mappings": {
+    "wp-content/themes/carpediem": "./themes/carpediem"
+  },
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_DISPLAY": true,
+    "SCRIPT_DEBUG": true
+  }
+}

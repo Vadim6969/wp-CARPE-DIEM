@@ -1,0 +1,13 @@
+/*
+Theme Name: Carpe Diem 2026
+Theme URI: https://example.com
+Author: —
+Description: Тёмная кастомная тема для магазина CARPE DIEM 2026 (WooCommerce).
+Version: 0.1.0
+Requires at least: 6.4
+Requires PHP: 8.0
+License: GPL-2.0-or-later
+Text Domain: carpediem
+*/
+
+/* Стили живут в assets/css/main.css — этот файл нужен WordPress только ради шапки выше. */

@@ -26,33 +26,6 @@ get_header();
 	</div>
 </section>
 
-<section class="community">
-	<span class="community__mark community__mark--left">&#43; Unity</span>
-	<span class="community__mark community__mark--right">Freedom &#43;</span>
-	<div class="container community__inner">
-		<h2 class="community__title">Спасибо за то,<br>что ты с нами</h2>
-		<p class="community__sub">Thank you for joining our community</p>
-		<p class="community__text">
-			Ты стал частью чего-то большего.<br>
-			Мы не просто бренд — мы объединение людей,<br>
-			которые ценят стиль, свободу и смысл.
-		</p>
-		<a class="btn" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Читать дальше <span class="btn__cross">&#10015;</span></a>
-	</div>
-</section>
-
-<div class="marquee" aria-hidden="true">
-	<div class="marquee__track">
-		<?php for ( $i = 0; $i < 2; $i++ ) : ?>
-			<span class="marquee__group">
-				<?php for ( $j = 0; $j < 6; $j++ ) : ?>
-					<span>Carpe Diem</span><span class="marquee__cross">&#10015;</span><span>Style of Soul</span><span class="marquee__cross">&#10015;</span>
-				<?php endfor; ?>
-			</span>
-		<?php endfor; ?>
-	</div>
-</div>
-
 <?php
 $cats = get_terms( array(
 	'taxonomy'   => 'product_cat',
@@ -88,6 +61,33 @@ if ( ! is_wp_error( $cats ) && $cats ) : ?>
 		</div>
 	</section>
 <?php endif; ?>
+
+<div class="marquee" aria-hidden="true">
+	<div class="marquee__track">
+		<?php for ( $i = 0; $i < 2; $i++ ) : ?>
+			<span class="marquee__group">
+				<?php for ( $j = 0; $j < 6; $j++ ) : ?>
+					<span>Carpe Diem</span><span class="marquee__cross">&#10015;</span><span>Style of Soul</span><span class="marquee__cross">&#10015;</span>
+				<?php endfor; ?>
+			</span>
+		<?php endfor; ?>
+	</div>
+</div>
+
+<section class="community">
+	<span class="community__mark community__mark--left">&#43; Unity</span>
+	<span class="community__mark community__mark--right">Freedom &#43;</span>
+	<div class="container community__inner">
+		<h2 class="community__title">Спасибо за то,<br>что ты с нами</h2>
+		<p class="community__sub">Thank you for joining our community</p>
+		<p class="community__text">
+			Ты стал частью чего-то большего.<br>
+			Мы не просто бренд — мы объединение людей,<br>
+			которые ценят стиль, свободу и смысл.
+		</p>
+		<a class="btn" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Читать дальше <span class="btn__cross">&#10015;</span></a>
+	</div>
+</section>
 
 <section class="section brand">
 	<div class="container brand__inner">

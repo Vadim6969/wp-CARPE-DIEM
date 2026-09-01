@@ -64,7 +64,9 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 } );
 
 require get_theme_file_path( 'inc/woo.php' );
+require get_theme_file_path( 'inc/filters.php' );
 require get_theme_file_path( 'inc/one-click.php' );
+require get_theme_file_path( 'inc/favorites.php' );
 require get_theme_file_path( 'inc/seo.php' );
 
 /**

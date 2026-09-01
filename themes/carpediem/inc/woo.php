@@ -131,15 +131,14 @@ function carpediem_product_features() {
 /** Строка «В избранное / Поделиться». */
 function carpediem_product_actions() {
 	global $product;
+
+	echo '<div class="prod-actions">';
+	carpediem_favorite_button( $product->get_id() );
 	printf(
-		'<div class="prod-actions">
-			<button class="prod-actions__btn" type="button" disabled title="Появится позже">%s В избранное</button>
-			<a class="prod-actions__btn" href="%s" target="_blank" rel="noopener">%s Поделиться</a>
-		</div>',
-		'<span aria-hidden="true">&#9825;</span>',
-		esc_url( 'https://t.me/share/url?url=' . rawurlencode( get_permalink( $product->get_id() ) ) ),
-		'<span aria-hidden="true">&#8599;</span>'
+		'<a class="prod-actions__btn" href="%s" target="_blank" rel="noopener"><span aria-hidden="true">&#8599;</span> Поделиться</a>',
+		esc_url( 'https://t.me/share/url?url=' . rawurlencode( get_permalink( $product->get_id() ) ) )
 	);
+	echo '</div>';
 }
 
 /** Три информационные колонки под товаром. */
@@ -217,7 +216,7 @@ add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 add_action( 'woocommerce_checkout_create_order', function ( $order, $data ) {
 	if ( ! empty( $data['carpediem_consent'] ) ) {
 		$order->update_meta_data( '_carpediem_consent', current_time( 'mysql' ) );
-		$order->update_meta_data( '_carpediem_consent_ip', isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+		$order->update_meta_data( '_carpediem_consent_ip', carpediem_client_ip() );
 	}
 }, 10, 2 );
 

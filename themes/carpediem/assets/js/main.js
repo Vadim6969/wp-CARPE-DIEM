@@ -21,10 +21,30 @@
 		} );
 
 		document.addEventListener( 'keydown', function ( e ) {
-			if ( e.key === 'Escape' && document.body.classList.contains( 'nav-open' ) ) {
+			if ( ! document.body.classList.contains( 'nav-open' ) ) {
+				return;
+			}
+
+			if ( e.key === 'Escape' ) {
 				burger.setAttribute( 'aria-expanded', 'false' );
 				document.body.classList.remove( 'nav-open' );
 				burger.focus();
+				return;
+			}
+
+			// Пока меню открыто, Tab не должен уводить фокус на страницу под ним.
+			if ( e.key === 'Tab' ) {
+				var stops = [ burger ].concat( Array.prototype.slice.call( nav.querySelectorAll( 'a[href]' ) ) );
+				var first = stops[ 0 ];
+				var last = stops[ stops.length - 1 ];
+
+				if ( e.shiftKey && document.activeElement === first ) {
+					e.preventDefault();
+					last.focus();
+				} else if ( ! e.shiftKey && document.activeElement === last ) {
+					e.preventDefault();
+					first.focus();
+				}
 			}
 		} );
 	}
@@ -246,4 +266,83 @@ if ( window.jQuery ) {
 	btn.addEventListener( 'click', function () {
 		apply( root.getAttribute( 'data-theme' ) === 'light' ? 'dark' : 'light' );
 	} );
+} )();
+
+/* Избранное: список id в localStorage этого браузера. */
+( function () {
+	'use strict';
+
+	var KEY = 'cd-favorites';
+
+	function read() {
+		try {
+			var raw = JSON.parse( localStorage.getItem( KEY ) );
+			return Array.isArray( raw ) ? raw.filter( function ( n ) { return typeof n === 'number'; } ) : [];
+		} catch ( e ) {
+			return [];
+		}
+	}
+
+	function write( ids ) {
+		try {
+			localStorage.setItem( KEY, JSON.stringify( ids.slice( 0, 50 ) ) );
+		} catch ( e ) {}
+	}
+
+	// Кнопка на странице товара
+	var toggle = document.querySelector( '.js-fav-toggle' );
+
+	if ( toggle ) {
+		var id = parseInt( toggle.dataset.id, 10 );
+
+		var paint = function () {
+			var saved = read().indexOf( id ) > -1;
+			toggle.setAttribute( 'aria-pressed', String( saved ) );
+			toggle.querySelector( '.js-fav-icon' ).innerHTML = saved ? '&#9829;' : '&#9825;';
+			toggle.querySelector( '.js-fav-label' ).textContent = saved ? 'В избранном' : 'В избранное';
+		};
+
+		toggle.addEventListener( 'click', function () {
+			var ids = read();
+			var at = ids.indexOf( id );
+
+			if ( at > -1 ) {
+				ids.splice( at, 1 );
+			} else {
+				ids.unshift( id );
+			}
+
+			write( ids );
+			paint();
+		} );
+
+		paint();
+	}
+
+	// Страница «Избранное»
+	var page = document.querySelector( '.js-favorites' );
+
+	if ( page ) {
+		var ids = read();
+		var empty = page.querySelector( '.js-favorites-empty' );
+		var list = page.querySelector( '.js-favorites-list' );
+
+		if ( ids.length ) {
+			var data = new FormData();
+			data.append( 'action', 'carpediem_favorites' );
+			ids.forEach( function ( value ) {
+				data.append( 'ids[]', value );
+			} );
+
+			fetch( page.dataset.ajax, { method: 'POST', body: data, credentials: 'same-origin' } )
+				.then( function ( r ) { return r.json(); } )
+				.then( function ( res ) {
+					if ( res && res.success && res.data.count ) {
+						list.innerHTML = res.data.html;
+						empty.hidden = true;
+					}
+				} )
+				.catch( function () {} );
+		}
+	}
 } )();

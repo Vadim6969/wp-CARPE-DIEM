@@ -66,6 +66,25 @@ add_action( 'wp_ajax_carpediem_one_click', 'carpediem_one_click_handler' );
 add_action( 'wp_ajax_nopriv_carpediem_one_click', 'carpediem_one_click_handler' );
 
 /**
+ * IP посетителя. За обратным прокси (Cloudflare, nginx) настоящий адрес приходит
+ * в X-Forwarded-For; доверяем этому заголовку, только если это разрешено явно —
+ * иначе лимит обходится подделкой заголовка.
+ * На боевом сервере за прокси добавить в wp-config.php: define( 'CARPEDIEM_TRUST_PROXY', true );
+ */
+function carpediem_client_ip() {
+	if ( defined( 'CARPEDIEM_TRUST_PROXY' ) && CARPEDIEM_TRUST_PROXY && ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$chain = explode( ',', sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) );
+		$ip    = filter_var( trim( reset( $chain ) ), FILTER_VALIDATE_IP );
+
+		if ( $ip ) {
+			return $ip;
+		}
+	}
+
+	return isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+}
+
+/**
  * Проверка данных заявки. Возвращает текст ошибки или null, если всё в порядке.
  * Вынесено отдельно, чтобы проверялось тестом без HTTP-запроса.
  */
@@ -90,7 +109,7 @@ function carpediem_one_click_handler() {
 	check_ajax_referer( 'carpediem_one_click', 'nonce' );
 
 	// Ограничение частоты: не больше CARPEDIEM_ONE_CLICK_LIMIT заявок с IP в час.
-	$ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+	$ip  = carpediem_client_ip();
 	$key = 'cd_one_click_' . md5( $ip );
 	$hits = (int) get_transient( $key );
 

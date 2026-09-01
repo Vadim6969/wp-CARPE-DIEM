@@ -7,6 +7,22 @@
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Латинские слаги для значений с кириллицей: иначе в адресе фильтра
+ * получается %d1%87%d1%91... вместо читаемого ?color[]=black.
+ */
+function cd_seed_term_slug( $value ) {
+	$map = array(
+		'Чёрный'               => 'black',
+		'Чёрный / Коричневый'  => 'black-brown',
+		'Графит'               => 'graphite',
+		'Серебро'              => 'silver',
+		'ONE SIZE'             => 'one-size',
+	);
+
+	return isset( $map[ $value ] ) ? $map[ $value ] : '';
+}
+
 /** Создаёт глобальный атрибут и его значения, возвращает имя таксономии. */
 function cd_seed_attribute( $label, $slug, $values ) {
 	$taxonomy = wc_attribute_taxonomy_name( $slug );
@@ -27,9 +43,17 @@ function cd_seed_attribute( $label, $slug, $values ) {
 
 	$position = 0;
 	foreach ( $values as $value ) {
-		$term = term_exists( $value, $taxonomy );
+		$term      = term_exists( $value, $taxonomy );
+		$term_slug = cd_seed_term_slug( $value );
+
 		if ( ! $term ) {
-			$term = wp_insert_term( $value, $taxonomy );
+			$term = wp_insert_term( $value, $taxonomy, $term_slug ? array( 'slug' => $term_slug ) : array() );
+		} elseif ( $term_slug ) {
+			// Чиним слаг у уже созданных значений.
+			$existing = get_term( (int) $term['term_id'], $taxonomy );
+			if ( $existing && $existing->slug !== $term_slug ) {
+				wp_update_term( (int) $term['term_id'], $taxonomy, array( 'slug' => $term_slug ) );
+			}
 		}
 		// Woo сортирует значения атрибута по этому мета-полю, иначе размеры идут по алфавиту.
 		if ( ! is_wp_error( $term ) ) {

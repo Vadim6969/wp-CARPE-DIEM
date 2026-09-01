@@ -119,6 +119,7 @@ update_option( 'woocommerce_email_background_color', '#f4f2ef' );
 update_option( 'woocommerce_email_body_background_color', '#ffffff' );
 update_option( 'woocommerce_email_text_color', '#1a1a1c' );
 update_option( 'woocommerce_email_from_name', get_bloginfo( 'name' ) );
+update_option( 'woocommerce_email_header_image', get_theme_file_uri( 'assets/img/email-header.png' ) );
 update_option( 'woocommerce_email_footer_text', 'CARPE DIEM 2026 — Style of Soul{n}{site_url}' );
 
 /* --- Промокод для проверки --- */

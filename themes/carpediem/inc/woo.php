@@ -51,6 +51,9 @@ add_filter( 'woocommerce_breadcrumb_defaults', function ( $args ) {
 	return $args;
 } );
 
+// Название вариации без «— M, Чёрный»: атрибуты показываем отдельными строками.
+add_filter( 'woocommerce_product_variation_title_include_attributes', '__return_false' );
+
 /* ---------- Карточка в сетке ---------- */
 
 // Кнопку «в корзину» из сетки убираем — покупка идёт со страницы товара (нужен размер).
@@ -182,6 +185,53 @@ function carpediem_cross_sells() {
 	</section>
 	<?php
 }
+
+/* ---------- Оформление заказа ---------- */
+
+// Согласие на обработку персональных данных (152-ФЗ) — обязательная галочка.
+add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
+	$privacy_url = get_privacy_policy_url();
+	$label       = 'Согласен на обработку персональных данных';
+
+	if ( $privacy_url ) {
+		$label .= sprintf( ' (<a href="%s" target="_blank" rel="noopener">политика конфиденциальности</a>)', esc_url( $privacy_url ) );
+	}
+
+	$fields['order']['carpediem_consent'] = array(
+		'type'     => 'checkbox',
+		'label'    => $label,
+		'required' => true,
+		'class'    => array( 'form-row-wide', 'consent-row' ),
+		'priority' => 200,
+	);
+
+	// Телефон обязателен, компания не нужна — это же настроено и в опциях Woo.
+	if ( isset( $fields['billing']['billing_phone'] ) ) {
+		$fields['billing']['billing_phone']['required'] = true;
+	}
+
+	return $fields;
+} );
+
+// Фиксируем факт согласия в заказе: дата и IP — это и есть доказательство по 152-ФЗ.
+add_action( 'woocommerce_checkout_create_order', function ( $order, $data ) {
+	if ( ! empty( $data['carpediem_consent'] ) ) {
+		$order->update_meta_data( '_carpediem_consent', current_time( 'mysql' ) );
+		$order->update_meta_data( '_carpediem_consent_ip', isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+	}
+}, 10, 2 );
+
+// Показываем это в админке рядом с адресом покупателя.
+add_action( 'woocommerce_admin_order_data_after_billing_address', function ( $order ) {
+	$date = $order->get_meta( '_carpediem_consent' );
+	if ( $date ) {
+		printf(
+			'<p><strong>Согласие на обработку ПДн:</strong> %s (IP %s)</p>',
+			esc_html( $date ),
+			esc_html( $order->get_meta( '_carpediem_consent_ip' ) )
+		);
+	}
+} );
 
 /* ---------- Уход и размеры ---------- */
 

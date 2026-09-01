@@ -1,3 +1,5 @@
 node_modules/
 .DS_Store
 *.log
+themes/carpediem/photos/*
+!themes/carpediem/photos/README.md

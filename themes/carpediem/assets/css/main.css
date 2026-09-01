@@ -781,7 +781,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	padding: 0;
 	list-style: none;
 }
-.single-product .flex-control-thumbs li { margin: 0; }
+.woocommerce div.product div.images .flex-control-thumbs li { width: 100%; float: none; margin: 0; }
+.single-product .flex-control-thumbs img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
 .single-product .flex-control-thumbs img { border: 1px solid var(--line); opacity: .6; cursor: pointer; transition: opacity .2s ease, border-color .2s ease; }
 .single-product .flex-control-thumbs img.flex-active,
 .single-product .flex-control-thumbs img:hover { opacity: 1; border-color: var(--accent); }

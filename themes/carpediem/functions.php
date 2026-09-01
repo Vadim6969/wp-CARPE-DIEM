@@ -41,6 +41,9 @@ add_action( 'wp_enqueue_scripts', function () {
 
 add_action( 'wp_head', function () {
 	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+
+	// Тема применяется до первой отрисовки, иначе при светлой теме мелькнёт тёмный фон.
+	echo '<script>(function(){try{var t=localStorage.getItem("cd-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();</script>' . "\n";
 }, 1 );
 
 // Скрипты эмодзи WP на этом сайте не нужны — минус два запроса на каждой странице.
@@ -79,6 +82,8 @@ function carpediem_asset_version( $relative_path ) {
 function carpediem_icon( $name, $size = 16 ) {
 	$paths = array(
 		'search'    => '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
+		'sun'       => '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>',
+		'moon'      => '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
 		'user'      => '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
 		'cart'      => '<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
 		'instagram' => '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/>',

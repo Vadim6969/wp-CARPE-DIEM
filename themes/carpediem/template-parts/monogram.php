@@ -10,9 +10,9 @@ $class = isset( $args['class'] ) ? $args['class'] : '';
 <svg class="monogram <?php echo esc_attr( $class ); ?>" viewBox="0 0 140 180" fill="none" aria-hidden="true" focusable="false">
 	<defs>
 		<linearGradient id="cd-silver" x1="0" y1="0" x2="0" y2="1">
-			<stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/>
-			<stop offset="50%" stop-color="#cfcac1" stop-opacity=".9"/>
-			<stop offset="100%" stop-color="#7c7975" stop-opacity=".9"/>
+			<stop offset="0%" stop-color="var(--mark-1)" stop-opacity=".95"/>
+			<stop offset="50%" stop-color="var(--mark-2)" stop-opacity=".9"/>
+			<stop offset="100%" stop-color="var(--mark-3)" stop-opacity=".9"/>
 		</linearGradient>
 	</defs>
 

@@ -10,12 +10,12 @@ get_header();
 <section class="hero">
 	<div class="hero__bg" aria-hidden="true">
 		<svg class="hero__bolt hero__bolt--left" viewBox="0 0 100 400" fill="none">
-			<path d="M66 0 46 92 60 100 40 210 54 218 26 400" stroke="rgba(255,255,255,.8)" stroke-width="1.3"/>
-			<path d="M52 104 76 168" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
+			<path d="M66 0 46 92 60 100 40 210 54 218 26 400" stroke="var(--bolt)" stroke-width="1.3"/>
+			<path d="M52 104 76 168" stroke="var(--bolt-soft)" stroke-width=".9"/>
 		</svg>
 		<svg class="hero__bolt hero__bolt--right" viewBox="0 0 100 400" fill="none">
-			<path d="M34 0 54 92 40 100 60 210 46 218 74 400" stroke="rgba(255,255,255,.8)" stroke-width="1.3"/>
-			<path d="M48 104 24 168" stroke="rgba(255,255,255,.4)" stroke-width=".9"/>
+			<path d="M34 0 54 92 40 100 60 210 46 218 74 400" stroke="var(--bolt)" stroke-width="1.3"/>
+			<path d="M48 104 24 168" stroke="var(--bolt-soft)" stroke-width=".9"/>
 		</svg>
 	</div>
 	<div class="container hero__inner">

@@ -20,6 +20,37 @@
 	--accent-hi: #ffffff;
 	--danger: #b3453c;
 
+	/* Производные от темы: поверхности, свечения, орнаменты */
+	--surface-soft: rgba(255, 255, 255, .02);
+	--line-hover: #3a3a42;
+	--glow: 0 0 24px rgba(255, 255, 255, .06);
+	--glow-card: 0 0 32px rgba(255, 255, 255, .05);
+	--header-bg: rgba(5, 5, 5, .72);
+	--header-bg-scrolled: rgba(5, 5, 5, .94);
+	--hero-bg:
+		radial-gradient(120% 80% at 50% 8%, rgba(190, 195, 205, .13), transparent 58%),
+		radial-gradient(60% 45% at 50% 45%, rgba(255, 255, 255, .05), transparent 70%),
+		linear-gradient(180deg, #0a0a0c 0%, #050505 65%);
+	--panel-glow: radial-gradient(80% 60% at 50% 0%, rgba(255, 255, 255, .045), transparent 60%);
+	--bolt: rgba(255, 255, 255, .8);
+	--bolt-soft: rgba(255, 255, 255, .4);
+	--bolt-glow: drop-shadow(0 0 16px rgba(205, 220, 255, .5));
+	--mark-1: #ffffff;
+	--mark-2: #cfcac1;
+	--mark-3: #7c7975;
+	--media-bg: linear-gradient(180deg, #131315, #08080a);
+	--media-veil: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, .75));
+	--brand-media-bg:
+		radial-gradient(70% 70% at 50% 40%, rgba(255, 255, 255, .07), transparent 70%),
+		linear-gradient(160deg, #141416, #08080a);
+	--ornament: #2c2c33;
+	--badge-bg: rgba(5, 5, 5, .8);
+	--dot-ring: rgba(255, 255, 255, .18);
+	--backdrop: rgba(0, 0, 0, .78);
+	--control: #8a8a92;
+	--img-filter: grayscale(.3) contrast(1.05);
+
+	/* Не зависят от темы */
 	--font-display: "Cormorant Garamond", "Times New Roman", serif;
 	--font-ui: "Manrope", -apple-system, "Segoe UI", Roboto, sans-serif;
 
@@ -28,6 +59,50 @@
 	--gutter: 20px;
 	--section-gap: 64px;
 	--header-h: 56px;
+}
+
+/* Светлая тема: те же токены, «бумажная» палитра. Переключается кнопкой в шапке. */
+:root[data-theme="light"] {
+	--bg: #f7f5f2;
+	--bg-panel: #ffffff;
+	--bg-elev: #f0ece7;
+	--line: #ddd7cf;
+	--line-soft: #eae6e0;
+	--text: #16161a;
+	--text-dim: #4e4e57;
+	--text-mute: #6f6f79;
+	--accent: #23232a;
+	--accent-hi: #000000;
+	--danger: #a33228;
+
+	--surface-soft: rgba(0, 0, 0, .02);
+	--line-hover: #b9b1a6;
+	--glow: 0 6px 18px rgba(30, 25, 20, .08);
+	--glow-card: 0 10px 30px rgba(30, 25, 20, .1);
+	--header-bg: rgba(247, 245, 242, .8);
+	--header-bg-scrolled: rgba(247, 245, 242, .96);
+	--hero-bg:
+		radial-gradient(120% 80% at 50% 8%, rgba(120, 125, 140, .12), transparent 58%),
+		radial-gradient(60% 45% at 50% 45%, rgba(255, 255, 255, .8), transparent 70%),
+		linear-gradient(180deg, #ffffff 0%, #f2efea 65%);
+	--panel-glow: radial-gradient(80% 60% at 50% 0%, rgba(0, 0, 0, .03), transparent 60%);
+	--bolt: rgba(40, 40, 48, .55);
+	--bolt-soft: rgba(40, 40, 48, .28);
+	--bolt-glow: drop-shadow(0 0 14px rgba(90, 100, 130, .25));
+	--mark-1: #2a2a31;
+	--mark-2: #4a4a53;
+	--mark-3: #8d8a85;
+	--media-bg: linear-gradient(180deg, #f3f0eb, #e6e1da);
+	--media-veil: linear-gradient(180deg, transparent 45%, rgba(20, 18, 16, .18));
+	--brand-media-bg:
+		radial-gradient(70% 70% at 50% 40%, rgba(0, 0, 0, .05), transparent 70%),
+		linear-gradient(160deg, #f4f1ec, #e7e2db);
+	--ornament: #c6bfb4;
+	--badge-bg: rgba(255, 255, 255, .88);
+	--dot-ring: rgba(0, 0, 0, .18);
+	--backdrop: rgba(30, 26, 22, .55);
+	--control: #4e4e57;
+	--img-filter: grayscale(.15) contrast(1.02);
 }
 
 @media (min-width: 900px) {
@@ -124,7 +199,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	min-height: 52px;
 	padding: 0 calc(var(--step) * 5);
 	border: 1px solid var(--line);
-	background: rgba(255, 255, 255, .02);
+	background: var(--surface-soft);
 	color: var(--accent);
 	font-size: 13px;
 	letter-spacing: .14em;
@@ -133,9 +208,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .btn:hover {
 	background: var(--bg-elev);
-	border-color: #33333a;
+	border-color: var(--line-hover);
 	color: var(--accent-hi);
-	box-shadow: 0 0 24px rgba(255, 255, 255, .06);
+	box-shadow: var(--glow);
 }
 .btn__cross { font-size: 11px; color: var(--text-dim); }
 
@@ -145,11 +220,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	top: 0;
 	z-index: 50;
 	border-bottom: 1px solid var(--line-soft);
-	background: rgba(5, 5, 5, .72);
+	background: var(--header-bg);
 	backdrop-filter: blur(12px);
 	transition: background .3s ease, border-color .3s ease;
 }
-.site-header.is-scrolled { background: rgba(5, 5, 5, .94); border-bottom-color: var(--line); }
+.site-header.is-scrolled { background: var(--header-bg-scrolled); border-bottom-color: var(--line); }
 
 .site-header__inner {
 	display: grid;
@@ -240,10 +315,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero__bg {
 	position: absolute;
 	inset: 0;
-	background:
-		radial-gradient(120% 80% at 50% 8%, rgba(190, 195, 205, .13), transparent 58%),
-		radial-gradient(60% 45% at 50% 45%, rgba(255, 255, 255, .05), transparent 70%),
-		linear-gradient(180deg, #0a0a0c 0%, #050505 65%);
+	background: var(--hero-bg);
 }
 .hero__bolt {
 	position: absolute;
@@ -251,7 +323,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	width: clamp(70px, 9vw, 130px);
 	height: 84%;
 	opacity: .42;
-	filter: drop-shadow(0 0 16px rgba(205, 220, 255, .5));
+	filter: var(--bolt-glow);
 }
 .hero__bolt--left { left: 7%; transform: rotate(-6deg); }
 .hero__bolt--right { right: 6%; transform: rotate(6deg); }
@@ -276,9 +348,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* ---------- 6. Community / Marquee ---------- */
 .community {
 	position: relative;
-	background:
-		radial-gradient(80% 60% at 50% 0%, rgba(255, 255, 255, .045), transparent 60%),
-		var(--bg-panel);
+	background: var(--panel-glow), var(--bg-panel);
 	border-block: 1px solid var(--line);
 	padding-block: calc(var(--section-gap) * .9);
 	text-align: center;
@@ -322,7 +392,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	color: var(--text-mute);
 	white-space: nowrap;
 }
-.marquee__cross { color: #2a2a2f; }
+.marquee__cross { color: var(--ornament); }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 /* ---------- 7. Категории / Бренд ---------- */
@@ -338,7 +408,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	background: var(--bg-panel);
 	transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease;
 }
-.cat-card:hover { border-color: #33333a; box-shadow: 0 0 32px rgba(255, 255, 255, .05); }
+.cat-card:hover { border-color: var(--line-hover); box-shadow: var(--glow-card); }
 
 .cat-card__media {
 	position: relative;
@@ -346,17 +416,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	place-items: center;
 	aspect-ratio: 3 / 4;
 	overflow: hidden;
-	background: linear-gradient(180deg, #131315, #08080a);
+	background: var(--media-bg);
 }
 .cat-card__media::after {
 	content: "";
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, .75));
+	background: var(--media-veil);
 }
-.cat-card__img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(.35) contrast(1.05); transition: transform .5s ease, filter .5s ease; }
+.cat-card__img { width: 100%; height: 100%; object-fit: cover; filter: var(--img-filter); transition: transform .5s ease, filter .5s ease; }
 .cat-card:hover .cat-card__img { transform: scale(1.04); filter: grayscale(0) contrast(1.1); }
-.cat-card__placeholder { font-size: 56px; color: #34343c; }
+.cat-card__placeholder { font-size: 56px; color: var(--ornament); }
 
 .cat-card__body { display: block; padding: calc(var(--step) * 3) calc(var(--step) * 2) calc(var(--step) * 3); text-align: center; }
 .cat-card__name {
@@ -388,9 +458,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	display: grid;
 	place-items: center;
 	min-height: 320px;
-	background:
-		radial-gradient(70% 70% at 50% 40%, rgba(255, 255, 255, .07), transparent 70%),
-		linear-gradient(160deg, #141416, #08080a);
+	background: var(--brand-media-bg);
 	border-bottom: 1px solid var(--line);
 }
 .brand__mark { width: clamp(120px, 16vw, 200px); opacity: .85; }
@@ -546,7 +614,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	margin-bottom: calc(var(--step) * 4);
 }
 .crumbs a { color: var(--text-dim); }
-.crumbs__sep { color: #3a3a42; margin-inline: 6px; }
+.crumbs__sep { color: var(--line-hover); margin-inline: 6px; }
 
 .price, .woocommerce-Price-amount {
 	font-family: var(--font-display);
@@ -583,7 +651,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	padding: 0 calc(var(--step) * 5);
 	border: 1px solid var(--line);
 	border-radius: 0;
-	background: rgba(255, 255, 255, .02);
+	background: var(--surface-soft);
 	color: var(--accent);
 	font-family: var(--font-ui);
 	font-size: 13px;
@@ -598,9 +666,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .woocommerce a.button.alt:hover,
 .woocommerce .button.alt:hover {
 	background: var(--bg-elev);
-	border-color: #3a3a42;
+	border-color: var(--line-hover);
 	color: var(--accent-hi);
-	box-shadow: 0 0 24px rgba(255, 255, 255, .06);
+	box-shadow: var(--glow);
 }
 .woocommerce button.button:disabled { opacity: .4; }
 
@@ -639,18 +707,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 	background: var(--bg-panel);
 	transition: border-color .3s ease, box-shadow .3s ease;
 }
-.woocommerce ul.products li.product:hover { border-color: #33333a; box-shadow: 0 0 32px rgba(255, 255, 255, .05); }
+.woocommerce ul.products li.product:hover { border-color: var(--line-hover); box-shadow: var(--glow-card); }
 .woocommerce ul.products li.product a { display: block; }
 .woocommerce ul.products li.product img {
 	width: 100%;
 	aspect-ratio: 3 / 4;
 	object-fit: cover;
 	margin: 0;
-	filter: grayscale(.3) contrast(1.05);
+	filter: var(--img-filter);
 	transition: transform .5s ease, filter .5s ease;
 }
 .woocommerce ul.products li.product:hover img { transform: scale(1.03); filter: grayscale(0); }
-.woocommerce ul.products li.product .badge-new { position: absolute; top: 12px; left: 12px; z-index: 2; background: rgba(5, 5, 5, .8); }
+.woocommerce ul.products li.product .badge-new { position: absolute; top: 12px; left: 12px; z-index: 2; background: var(--badge-bg); }
 
 .loop-card__cat {
 	display: block;
@@ -763,7 +831,7 @@ select.is-swatched { display: none; }
 .swatch.is-disabled { opacity: .3; text-decoration: line-through; cursor: not-allowed; }
 
 .swatches--color .swatch { min-width: 0; width: 44px; padding: 0; display: grid; place-items: center; border-radius: 50%; }
-.swatch__dot { width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .18); }
+.swatch__dot { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--dot-ring); }
 
 .woocommerce-variation-price { margin-bottom: calc(var(--step) * 2); }
 .woocommerce-variation-availability { font-size: 13px; color: var(--text-dim); }
@@ -923,7 +991,7 @@ select.is-swatched { display: none; }
 .woocommerce button.js-update-cart { display: none; } /* нажимаем её из JS после − / + */
 
 .cart-thanks { display: flex; align-items: center; gap: calc(var(--step) * 3); padding: calc(var(--step) * 4) 0 var(--step); }
-.cart-thanks__cross { font-size: 26px; color: #2c2c33; }
+.cart-thanks__cross { font-size: 26px; color: var(--ornament); }
 .cart-thanks__title { font-size: 18px; letter-spacing: .16em; }
 .cart-thanks__text { margin-top: 6px; font-size: 13px; letter-spacing: .06em; color: var(--text-mute); }
 
@@ -1067,10 +1135,10 @@ select.is-swatched { display: none; }
 	text-transform: none;
 	color: var(--text-dim);
 }
-.woocommerce form .form-row label.checkbox input { margin-top: 3px; accent-color: #8a8a92; }
+.woocommerce form .form-row label.checkbox input { margin-top: 3px; accent-color: var(--control); }
 .woocommerce form .form-row label.checkbox a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .woocommerce-form__label-for-checkbox { display: flex; gap: var(--step); align-items: flex-start; text-transform: none; letter-spacing: .02em; color: var(--text-dim); }
-.woocommerce-form__label-for-checkbox input { margin-top: 3px; accent-color: #8a8a92; }
+.woocommerce-form__label-for-checkbox input { margin-top: 3px; accent-color: var(--control); }
 
 /* Заказ оформлен */
 .woocommerce-order { max-width: 760px; margin-inline: auto; }
@@ -1135,7 +1203,7 @@ select.is-swatched { display: none; }
 	background: var(--bg-panel);
 	color: var(--text);
 }
-.one-click::backdrop { background: rgba(0, 0, 0, .78); backdrop-filter: blur(3px); }
+.one-click::backdrop { background: var(--backdrop); backdrop-filter: blur(3px); }
 .one-click__title { font-size: 20px; letter-spacing: .16em; }
 .one-click__text { margin-top: var(--step); font-size: 14px; color: var(--text-dim); }
 .one-click__label {
@@ -1163,7 +1231,7 @@ select.is-swatched { display: none; }
 	font-size: 13px;
 	color: var(--text-dim);
 }
-.one-click__consent input { margin-top: 3px; accent-color: #8a8a92; }
+.one-click__consent input { margin-top: 3px; accent-color: var(--control); }
 .one-click__consent a { text-decoration: underline; text-underline-offset: 3px; }
 .one-click__error { margin-top: calc(var(--step) * 2); font-size: 13px; color: var(--danger); }
 .one-click__actions { display: flex; align-items: center; gap: calc(var(--step) * 2); margin-top: calc(var(--step) * 3); }
@@ -1180,7 +1248,7 @@ select.is-swatched { display: none; }
 
 /* ---------- 404 ---------- */
 .error-404 { text-align: center; padding-block: calc(var(--step) * 6); }
-.error-404__cross { display: block; font-size: 28px; color: #2c2c33; }
+.error-404__cross { display: block; font-size: 28px; color: var(--ornament); }
 .error-404__code { font-size: clamp(56px, 12vw, 120px); letter-spacing: .2em; margin: calc(var(--step) * 2) 0 0 .2em; }
 .error-404__text { margin-top: calc(var(--step) * 2); color: var(--text-dim); }
 .error-404__actions { display: flex; flex-wrap: wrap; gap: var(--step); justify-content: center; margin-top: calc(var(--step) * 4); }
@@ -1188,3 +1256,20 @@ select.is-swatched { display: none; }
 /* Списки в текстовых страницах */
 .entry-content ul, .entry-content ol { padding-left: 22px; }
 .entry-content li + li { margin-top: 6px; }
+
+/* ---------- Переключатель темы ---------- */
+.theme-toggle {
+	display: inline-grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	color: var(--text-dim);
+	transition: color .2s ease;
+}
+.theme-toggle:hover { color: var(--accent-hi); }
+.theme-toggle__moon { display: none; }
+:root[data-theme="light"] .theme-toggle__sun { display: none; }
+:root[data-theme="light"] .theme-toggle__moon { display: block; }
+
+/* Заглушка фото прозрачная — подложку даёт тема. */
+.woocommerce-placeholder { background: var(--media-bg); }

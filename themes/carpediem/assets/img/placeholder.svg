@@ -5,11 +5,11 @@
 			<stop offset="100%" stop-color="#08080a"/>
 		</linearGradient>
 		<linearGradient id="mark" x1="0" y1="0" x2="0" y2="1">
-			<stop offset="0%" stop-color="#4a4a52"/>
-			<stop offset="100%" stop-color="#2a2a30"/>
+			<stop offset="0%" stop-color="#8c8c96"/>
+			<stop offset="100%" stop-color="#6a6a74"/>
 		</linearGradient>
 	</defs>
-	<rect width="600" height="800" fill="url(#bg)"/>
+	
 	<g stroke="url(#mark)" stroke-width="2" fill="none">
 		<path d="M300 300 306 312 300 324 294 312z"/>
 		<path d="M300 324v152"/>

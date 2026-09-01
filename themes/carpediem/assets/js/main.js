@@ -221,3 +221,29 @@ if ( window.jQuery ) {
 			} );
 	} );
 } )();
+
+/* Переключатель светлой и тёмной темы. Выбор запоминается в localStorage. */
+( function () {
+	'use strict';
+
+	var btn = document.querySelector( '.js-theme-toggle' );
+	if ( ! btn ) {
+		return;
+	}
+
+	var root = document.documentElement;
+
+	function apply( theme ) {
+		root.setAttribute( 'data-theme', theme );
+		btn.setAttribute( 'aria-pressed', String( theme === 'light' ) );
+		try {
+			localStorage.setItem( 'cd-theme', theme );
+		} catch ( e ) {}
+	}
+
+	apply( root.getAttribute( 'data-theme' ) === 'light' ? 'light' : 'dark' );
+
+	btn.addEventListener( 'click', function () {
+		apply( root.getAttribute( 'data-theme' ) === 'light' ? 'dark' : 'light' );
+	} );
+} )();

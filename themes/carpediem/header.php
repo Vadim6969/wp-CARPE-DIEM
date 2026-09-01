@@ -31,6 +31,11 @@
 		</a>
 
 		<div class="site-header__actions">
+			<button class="theme-toggle js-theme-toggle" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема">
+				<span class="theme-toggle__sun"><?php echo carpediem_icon( 'sun' ); // phpcs:ignore ?></span>
+				<span class="theme-toggle__moon"><?php echo carpediem_icon( 'moon' ); // phpcs:ignore ?></span>
+			</button>
+
 			<details class="hsearch">
 				<summary><?php echo carpediem_icon( 'search' ); // phpcs:ignore ?><span>Поиск</span></summary>
 				<div class="hsearch__panel"><?php get_search_form(); ?></div>

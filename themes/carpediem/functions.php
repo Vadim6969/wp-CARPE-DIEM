@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const CARPEDIEM_VERSION = '0.2.0';
+const CARPEDIEM_VERSION = '0.3.0';
 
 add_action( 'after_setup_theme', function () {
 	add_theme_support( 'title-tag' );
@@ -34,8 +34,9 @@ add_action( 'wp_enqueue_scripts', function () {
 		array(),
 		null
 	);
-	wp_enqueue_style( 'carpediem', get_theme_file_uri( 'assets/css/main.css' ), array( 'carpediem-fonts' ), CARPEDIEM_VERSION );
-	wp_enqueue_script( 'carpediem', get_theme_file_uri( 'assets/js/main.js' ), array(), CARPEDIEM_VERSION, true );
+	// Версия по времени правки файла: не думаем о кэше ни в разработке, ни при деплое.
+	wp_enqueue_style( 'carpediem', get_theme_file_uri( 'assets/css/main.css' ), array( 'carpediem-fonts' ), carpediem_asset_version( 'assets/css/main.css' ) );
+	wp_enqueue_script( 'carpediem', get_theme_file_uri( 'assets/js/main.js' ), array(), carpediem_asset_version( 'assets/js/main.js' ), true );
 } );
 
 add_action( 'wp_head', function () {
@@ -50,6 +51,17 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 
 	return $fragments;
 } );
+
+require get_theme_file_path( 'inc/woo.php' );
+
+/**
+ * Версия ассета = время последней правки файла.
+ */
+function carpediem_asset_version( $relative_path ) {
+	$file = get_theme_file_path( $relative_path );
+
+	return file_exists( $file ) ? (string) filemtime( $file ) : CARPEDIEM_VERSION;
+}
 
 /**
  * Иконки интерфейса. Возвращает готовый inline-SVG.

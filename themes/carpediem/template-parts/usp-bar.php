@@ -31,7 +31,7 @@ $items = array(
 	<div class="container usp__grid">
 		<?php foreach ( $items as $item ) : ?>
 			<div class="usp__item">
-				<svg class="usp__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true"><?php echo $item['icon']; // phpcs:ignore ?></svg>
+				<svg class="usp__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $item['icon']; // phpcs:ignore ?></svg>
 				<div>
 					<h3 class="usp__title"><?php echo esc_html( $item['title'] ); ?></h3>
 					<p class="usp__text"><?php echo esc_html( $item['text'] ); ?></p>

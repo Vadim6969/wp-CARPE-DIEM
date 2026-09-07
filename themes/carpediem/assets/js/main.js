@@ -280,7 +280,6 @@
 			var saved = ids.indexOf( Number( toggle.dataset.id ) ) > -1;
 			toggle.setAttribute( 'aria-pressed', String( saved ) );
 			toggle.setAttribute( 'aria-label', saved ? 'Убрать из избранного' : 'В избранное' );
-			toggle.querySelector( '.js-fav-icon' ).textContent = saved ? '♥' : '♡';
 			toggle.querySelector( '.js-fav-label' ).textContent = saved ? 'В избранном' : 'В избранное';
 		} );
 	}

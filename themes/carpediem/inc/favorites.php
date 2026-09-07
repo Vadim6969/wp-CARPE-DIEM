@@ -14,11 +14,12 @@ defined( 'ABSPATH' ) || exit;
 function carpediem_favorite_button( $product_id, $compact = false ) {
 	printf(
 		'<button class="prod-actions__btn js-fav-toggle %2$s" type="button" data-id="%1$d" aria-pressed="false" aria-label="В избранное">
-			<span class="js-fav-icon" aria-hidden="true">&#9825;</span> <span class="js-fav-label %3$s">В избранное</span>
+			<span class="js-fav-icon" aria-hidden="true">%4$s</span> <span class="js-fav-label %3$s">В избранное</span>
 		</button>',
 		(int) $product_id,
 		$compact ? 'loop-favorite' : '',
-		$compact ? 'screen-reader-text' : ''
+		$compact ? 'screen-reader-text' : '',
+		carpediem_icon( 'heart', 20 )
 	);
 }
 

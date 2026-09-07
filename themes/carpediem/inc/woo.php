@@ -31,6 +31,8 @@ add_action( 'wp_enqueue_scripts', function () {
 add_filter( 'loop_shop_per_page', fn() => 12, 20 );
 add_filter( 'loop_shop_columns', fn() => 4, 20 );
 remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
+// Итоги уже выведены в правой колонке нашего шаблона корзины.
+remove_action( 'woocommerce_cart_collaterals', 'woocommerce_cart_totals', 10 );
 
 // Свой контейнер вокруг контента Woo вместо дефолтной обёртки.
 remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
@@ -76,6 +78,53 @@ function carpediem_new_badge() {
 	}
 }
 add_action( 'woocommerce_before_shop_loop_item_title', 'carpediem_new_badge', 15 );
+
+// После закрывающей ссылки: кнопка избранного не вложена в ссылку товара.
+add_action( 'woocommerce_after_shop_loop_item', function () {
+	global $product;
+	carpediem_favorite_button( $product->get_id(), true );
+	if ( ! $product->is_type( 'variable' ) ) { return; }
+	$sizes = array();
+	foreach ( $product->get_available_variations( 'objects' ) as $variation ) {
+		if ( ! $variation->is_in_stock() || ! $variation->is_purchasable() ) { continue; }
+		$slug = $variation->get_attribute( 'pa_size' );
+		if ( $slug ) { $sizes[] = $slug; }
+	}
+	if ( $sizes ) { echo '<p class="loop-sizes"><span class="screen-reader-text">Доступные размеры: </span>' . esc_html( implode( ' · ', array_unique( $sizes ) ) ) . '</p>'; }
+}, 15 );
+
+add_action( 'woocommerce_before_variations_form', function () {
+	global $product;
+	if ( carpediem_size_table( $product ) ) { echo '<a class="size-guide-link" href="#product-sizes">Таблица размеров ↗</a>'; }
+} );
+
+add_action( 'woocommerce_single_product_summary', function () {
+	echo '<div class="product-service">';
+	foreach ( array( 'delivery' => array( 'Доставка', 'delivery_note' ), 'returns' => array( 'Обмен и возврат', 'returns_note' ) ) as $path => $item ) {
+		if ( carpediem_setting( $item[1] ) ) {
+			echo '<a href="' . esc_url( home_url( '/' . $path . '/' ) ) . '"><strong>' . esc_html( $item[0] ) . ' ↗</strong><span>' . esc_html( carpediem_setting( $item[1] ) ) . '</span></a>';
+		}
+	}
+	echo '</div>';
+}, 32 );
+
+add_action( 'woocommerce_archive_description', function () {
+	$terms = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true, 'parent' => 0, 'exclude' => array( get_option( 'default_product_cat' ) ) ) );
+	if ( is_wp_error( $terms ) || ! $terms ) { return; }
+	echo '<nav class="catalog-categories" aria-label="Категории товаров"><a href="' . esc_url( wc_get_page_permalink( 'shop' ) ) . '"' . ( is_shop() ? ' aria-current="page"' : '' ) . '>Все вещи</a>';
+	foreach ( $terms as $term ) {
+		echo '<a href="' . esc_url( get_term_link( $term ) ) . '"' . ( is_product_category( $term->slug ) ? ' aria-current="page"' : '' ) . '>' . esc_html( $term->name ) . '</a>';
+	}
+	echo '</nav>';
+}, 20 );
+
+// Существующее меню сохраняется в WordPress, исправляется только дублирующая ссылка.
+add_filter( 'nav_menu_link_attributes', function ( $attrs, $item, $args ) {
+	if ( 'primary' === ( $args->theme_location ?? '' ) && 'COLLECTIONS' === strtoupper( $item->title ) && untrailingslashit( (string) wp_parse_url( $item->url, PHP_URL_PATH ) ) === untrailingslashit( (string) wp_parse_url( home_url( '/catalog/' ), PHP_URL_PATH ) ) ) {
+		$attrs['href'] = home_url( carpediem_home_categories() ? '/#collections' : '/#selection' );
+	}
+	return $attrs;
+}, 10, 3 );
 
 /* ---------- Страница товара ---------- */
 
@@ -257,8 +306,8 @@ function carpediem_care_icon( $value ) {
  * Размерная сетка по слагу категории. Пусто — блок не выводится.
  * Значения в сантиметрах, меняются здесь.
  */
-function carpediem_size_table( $product ) {
-	$tables = array(
+function carpediem_default_size_tables() {
+	return array(
 		'hoodie'     => array(
 			'head' => array( 'Размер', 'Длина', 'Грудь', 'Плечи', 'Рукав' ),
 			'rows' => array(
@@ -282,11 +331,25 @@ function carpediem_size_table( $product ) {
 		),
 	);
 
-	$slugs = wp_get_post_terms( $product->get_id(), 'product_cat', array( 'fields' => 'slugs' ) );
+}
 
-	foreach ( (array) $slugs as $slug ) {
-		if ( isset( $tables[ $slug ] ) ) {
-			return $tables[ $slug ];
+function carpediem_category_size_table( $term ) {
+	if ( metadata_exists( 'term', $term->term_id, 'carpediem_size_table' ) ) {
+		return get_term_meta( $term->term_id, 'carpediem_size_table', true ) ?: null;
+	}
+	return carpediem_default_size_tables()[ $term->slug ] ?? null;
+}
+
+function carpediem_size_table( $product ) {
+	$terms = wp_get_post_terms( $product->get_id(), 'product_cat' );
+	if ( is_wp_error( $terms ) ) {
+		return null;
+	}
+
+	foreach ( $terms as $term ) {
+		$table = carpediem_category_size_table( $term );
+		if ( $table ) {
+			return $table;
 		}
 	}
 

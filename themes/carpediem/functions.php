@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const CARPEDIEM_VERSION = '0.3.0';
+const CARPEDIEM_VERSION = '0.4.0';
 
 add_action( 'after_setup_theme', function () {
 	add_theme_support( 'title-tag' );
@@ -36,7 +36,11 @@ add_action( 'wp_enqueue_scripts', function () {
 	);
 	// Версия по времени правки файла: не думаем о кэше ни в разработке, ни при деплое.
 	wp_enqueue_style( 'carpediem', get_theme_file_uri( 'assets/css/main.css' ), array( 'carpediem-fonts' ), carpediem_asset_version( 'assets/css/main.css' ) );
-	wp_enqueue_script( 'carpediem', get_theme_file_uri( 'assets/js/main.js' ), array(), carpediem_asset_version( 'assets/js/main.js' ), true );
+	wp_enqueue_script( 'carpediem', get_theme_file_uri( 'assets/js/main.js' ), array( 'jquery' ), carpediem_asset_version( 'assets/js/main.js' ), true );
+	wp_localize_script( 'carpediem', 'carpediemUI', array( 'colors' => carpediem_color_swatches() ) );
+	if ( function_exists( 'WC' ) ) {
+		wp_enqueue_script( 'wc-cart-fragments' );
+	}
 } );
 
 add_action( 'wp_head', function () {
@@ -63,6 +67,8 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 	return $fragments;
 } );
 
+require get_theme_file_path( 'inc/settings.php' );
+require get_theme_file_path( 'inc/admin.php' );
 require get_theme_file_path( 'inc/woo.php' );
 require get_theme_file_path( 'inc/filters.php' );
 require get_theme_file_path( 'inc/one-click.php' );
@@ -88,6 +94,7 @@ function carpediem_icon( $name, $size = 16 ) {
 		'moon'      => '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
 		'user'      => '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
 		'cart'      => '<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+		'heart'     => '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>',
 		'instagram' => '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/>',
 		'telegram'  => '<path d="M21 5L3 12l5 2 2 5 3-4 5 4z"/><path d="M8 14l10-9"/>',
 		'vk'        => '<path d="M4 8h3c.6 3.4 2 5.6 3.5 6.3V8h3v3.7c1.4-.2 2.7-1.7 3.2-3.7h3c-.5 2.3-1.7 3.9-2.9 4.8 1.3.9 2.4 2.3 3 5.2h-3.3c-.5-2-1.6-3.3-3-3.6V18H11C7.4 18 4.8 14.4 4 8z"/>',
@@ -105,13 +112,11 @@ function carpediem_icon( $name, $size = 16 ) {
 	);
 }
 
-/**
- * Ссылки на соцсети. Меняются здесь, пока их не нужно править из админки.
- */
+/** Ссылки на соцсети, заполненные в панели магазина. */
 function carpediem_socials() {
-	return array(
-		'instagram' => '#',
-		'telegram'  => '#',
-		'vk'        => '#',
-	);
+	return array_filter( array(
+		'instagram' => carpediem_setting( 'instagram' ),
+		'telegram'  => carpediem_setting( 'telegram' ),
+		'vk'        => carpediem_setting( 'vk' ),
+	) );
 }

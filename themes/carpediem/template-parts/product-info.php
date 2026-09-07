@@ -46,7 +46,7 @@ $density     = array_filter( (array) $density, fn( $v ) => '—' !== $v );
 		<?php endif; ?>
 
 		<?php if ( $sizes ) : ?>
-			<details class="info-col" open>
+			<details class="info-col" id="product-sizes" open>
 				<summary class="info-col__title">Таблица размеров</summary>
 				<div class="info-col__body">
 					<div class="size-table__scroll">

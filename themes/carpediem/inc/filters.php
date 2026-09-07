@@ -83,6 +83,7 @@ add_action( 'woocommerce_product_query', function ( $query ) {
  * Панель фильтров над сеткой каталога.
  */
 add_action( 'woocommerce_before_shop_loop', 'carpediem_filters_bar', 15 );
+add_action( 'woocommerce_no_products_found', 'carpediem_filters_bar', 5 );
 
 function carpediem_filters_bar() {
 	if ( ! is_shop() && ! is_product_category() && ! is_product_tag() ) {
@@ -116,6 +117,9 @@ function carpediem_filters_bar() {
 		</summary>
 
 		<form class="filters__form" method="get" action="<?php echo esc_url( is_wp_error( $action ) ? wc_get_page_permalink( 'shop' ) : $action ); ?>">
+			<?php if ( isset( $_GET['orderby'] ) && is_string( $_GET['orderby'] ) ) : ?>
+				<input type="hidden" name="orderby" value="<?php echo esc_attr( sanitize_key( wp_unslash( $_GET['orderby'] ) ) ); ?>">
+			<?php endif; ?>
 
 			<?php if ( $sizes ) : ?>
 				<fieldset class="filters__group">

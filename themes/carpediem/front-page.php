@@ -1,108 +1,78 @@
 <?php
-/**
- * Главная страница.
- * Тексты пока в шаблоне — выносим в опции, когда заказчик захочет править сам.
- */
+/** Главная: бренд, подборка вещей, категории и история. */
 defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
-
-<section class="hero">
-	<div class="hero__bg" aria-hidden="true">
-		<svg class="hero__bolt hero__bolt--left" viewBox="0 0 100 400" fill="none">
-			<path d="M66 0 46 92 60 100 40 210 54 218 26 400" stroke="var(--bolt)" stroke-width="1.3"/>
-			<path d="M52 104 76 168" stroke="var(--bolt-soft)" stroke-width=".9"/>
-		</svg>
-		<svg class="hero__bolt hero__bolt--right" viewBox="0 0 100 400" fill="none">
-			<path d="M34 0 54 92 40 100 60 210 46 218 74 400" stroke="var(--bolt)" stroke-width="1.3"/>
-			<path d="M48 104 24 168" stroke="var(--bolt-soft)" stroke-width=".9"/>
-		</svg>
-	</div>
-	<div class="container hero__inner">
-		<?php get_template_part( 'template-parts/monogram', null, array( 'class' => 'hero__mark' ) ); ?>
-		<h1 class="hero__title"><?php bloginfo( 'name' ); ?></h1>
-		<p class="hero__year">2026</p>
-		<span class="hero__cross">&#10015;</span>
+<section class="hero hero--editorial">
+	<div class="container hero__layout">
+		<div class="hero__copy">
+			<p class="eyebrow"><span class="eyebrow__cross" aria-hidden="true">✟</span> <?php echo esc_html( carpediem_setting( 'collection' ) ); ?></p>
+			<h1 class="hero__headline"><?php echo esc_html( carpediem_setting( 'hero_title' ) ); ?></h1>
+			<p class="hero__description"><?php echo esc_html( carpediem_setting( 'hero_text' ) ); ?></p>
+			<div class="hero__actions">
+				<a class="btn btn--primary" href="<?php echo esc_url( carpediem_setting( 'hero_url' ) ?: home_url( '/catalog/' ) ); ?>"><?php echo esc_html( carpediem_setting( 'hero_button' ) ?: 'Смотреть коллекцию' ); ?> <span aria-hidden="true">↗</span></a>
+				<a class="text-link" href="#selection">Выбор бренда <span aria-hidden="true">↓</span></a>
+			</div>
+			<div class="hero__signature"><span>CARPE DIEM</span><span>Style of Soul</span></div>
+		</div>
+		<div class="hero__art <?php echo carpediem_setting( 'hero_image' ) ? 'hero__art--photo' : ''; ?>">
+			<?php if ( carpediem_setting( 'hero_image' ) ) : ?>
+				<?php echo wp_get_attachment_image( carpediem_setting( 'hero_image' ), 'large', false, array( 'class' => 'hero__image', 'fetchpriority' => 'high', 'loading' => 'eager', 'sizes' => '(max-width: 899px) 100vw, 50vw' ) ); ?>
+			<?php else : ?>
+				<div class="hero__orbit" aria-hidden="true"></div>
+				<?php get_template_part( 'template-parts/monogram', null, array( 'class' => 'hero__emblem' ) ); ?>
+			<?php endif; ?>
+			<span class="hero__art-label">CARPE DIEM / <?php echo esc_html( carpediem_setting( 'collection' ) ); ?></span>
+			<span class="hero__art-cross" aria-hidden="true">✟</span>
+		</div>
 	</div>
 </section>
 
-<?php
-$cats = get_terms( array(
-	'taxonomy'   => 'product_cat',
-	'hide_empty' => false,
-	'exclude'    => array( get_option( 'default_product_cat' ) ),
-	'orderby'    => 'id', // порядок создания категорий = порядок в сетке
-	'number'     => 6,
-) );
-
-if ( ! is_wp_error( $cats ) && $cats ) : ?>
-	<section class="section categories">
-		<div class="container">
-			<h2 class="section-title">Категории</h2>
-			<div class="categories__grid">
-				<?php foreach ( $cats as $cat ) :
-					$thumb_id = get_term_meta( $cat->term_id, 'thumbnail_id', true );
-					?>
-					<a class="cat-card" href="<?php echo esc_url( get_term_link( $cat ) ); ?>">
-						<span class="cat-card__media">
-							<?php if ( $thumb_id ) : ?>
-								<?php echo wp_get_attachment_image( $thumb_id, 'large', false, array( 'class' => 'cat-card__img', 'loading' => 'lazy' ) ); ?>
-							<?php else : ?>
-								<span class="cat-card__placeholder" aria-hidden="true">&#10015;</span>
-							<?php endif; ?>
-						</span>
-						<span class="cat-card__body">
-							<span class="cat-card__name"><?php echo esc_html( $cat->name ); ?></span>
-							<span class="cat-card__link">Перейти <span class="btn__cross">&#10015;</span></span>
-						</span>
-					</a>
-				<?php endforeach; ?>
-			</div>
+<section class="section home-selection" id="selection">
+	<div class="container">
+		<div class="section-heading"><div><p class="eyebrow">Вещи со смыслом</p><h2><?php echo esc_html( carpediem_setting( 'selection_title' ) ); ?></h2></div><a class="text-link" href="<?php echo esc_url( home_url( '/catalog/' ) ); ?>">Весь каталог ↗</a></div>
+		<div class="woocommerce">
+		<?php
+		$ids = array_filter( (array) carpediem_setting( 'product_ids' ), function ( $id ) {
+			$item = wc_get_product( $id );
+			return $item && 'publish' === $item->get_status() && $item->is_visible();
+		} );
+		if ( $ids ) {
+			echo do_shortcode( '[products ids="' . implode( ',', array_map( 'absint', $ids ) ) . '" orderby="post__in" columns="4"]' );
+		} else {
+			echo do_shortcode( '[products limit="4" columns="4" orderby="date" order="DESC" visibility="visible"]' );
+		}
+		?>
 		</div>
-	</section>
+	</div>
+</section>
+
+<?php $cats = carpediem_home_categories(); if ( $cats ) : ?>
+<section class="section categories" id="collections">
+	<div class="container">
+		<div class="section-heading"><div><p class="eyebrow">Собери свой образ</p><h2>Категории</h2></div><span class="section-heading__note">Твой стиль. Твой выбор.</span></div>
+		<div class="categories__grid">
+			<?php foreach ( $cats as $i => $cat ) : $thumb_id = get_term_meta( $cat->term_id, 'thumbnail_id', true ); ?>
+				<a class="cat-card" href="<?php echo esc_url( get_term_link( $cat ) ); ?>">
+					<span class="cat-card__media"><?php if ( $thumb_id ) { echo wp_get_attachment_image( $thumb_id, 'woocommerce_thumbnail', false, array( 'class' => 'cat-card__img', 'loading' => 'lazy' ) ); } else { echo '<span class="cat-card__placeholder" aria-hidden="true">✟</span>'; } ?></span>
+					<span class="cat-card__body"><span class="cat-card__number"><?php echo esc_html( sprintf( '%02d', $i + 1 ) ); ?></span><span class="cat-card__name"><?php echo esc_html( $cat->name ); ?></span><span class="cat-card__arrow" aria-hidden="true">↗</span></span>
+				</a>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
 <?php endif; ?>
 
-<div class="marquee" aria-hidden="true">
-	<div class="marquee__track">
-		<?php for ( $i = 0; $i < 2; $i++ ) : ?>
-			<span class="marquee__group">
-				<?php for ( $j = 0; $j < 6; $j++ ) : ?>
-					<span>Carpe Diem</span><span class="marquee__cross">&#10015;</span><span>Style of Soul</span><span class="marquee__cross">&#10015;</span>
-				<?php endfor; ?>
-			</span>
-		<?php endfor; ?>
-	</div>
-</div>
-
-<section class="community">
-	<span class="community__mark community__mark--left">&#43; Unity</span>
-	<span class="community__mark community__mark--right">Freedom &#43;</span>
-	<div class="container community__inner">
-		<h2 class="community__title">Спасибо за то,<br>что ты с нами</h2>
-		<p class="community__sub">Thank you for joining our community</p>
-		<p class="community__text">
-			Ты стал частью чего-то большего.<br>
-			Мы не просто бренд — мы объединение людей,<br>
-			которые ценят стиль, свободу и смысл.
-		</p>
-		<a class="btn" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Читать дальше <span class="btn__cross">&#10015;</span></a>
-	</div>
-</section>
+<div class="marquee" aria-hidden="true"><div class="marquee__track">
+	<?php for ( $i = 0; $i < 2; $i++ ) : ?><span class="marquee__group"><?php for ( $j = 0; $j < 6; $j++ ) : ?><span>Carpe Diem</span><span class="marquee__cross">✟</span><span>Style of Soul</span><span class="marquee__cross">✟</span><?php endfor; ?></span><?php endfor; ?>
+</div></div>
 
 <section class="section brand">
-	<div class="container brand__inner">
-		<div class="brand__media">
-			<?php get_template_part( 'template-parts/monogram', null, array( 'class' => 'brand__mark' ) ); ?>
-		</div>
-		<div class="brand__body">
-			<h2 class="brand__title">Carpe Diem —<br>Style of Soul</h2>
-			<p class="brand__text">
-				Каждая вещь — это больше, чем одежда.<br>
-				Это часть пути, которую мы создаём вместе.
-			</p>
-			<a class="btn" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Узнать нашу историю <span class="btn__cross">&#10015;</span></a>
-		</div>
-	</div>
+	<div class="container"><div class="brand__inner">
+		<div class="brand__media"><?php if ( carpediem_setting( 'brand_image' ) ) { echo wp_get_attachment_image( carpediem_setting( 'brand_image' ), 'large', false, array( 'class' => 'brand__image', 'loading' => 'lazy' ) ); } else { get_template_part( 'template-parts/monogram', null, array( 'class' => 'brand__mark' ) ); } ?></div>
+		<div class="brand__body"><p class="eyebrow">Больше, чем одежда</p><h2 class="brand__title"><?php echo esc_html( carpediem_setting( 'brand_title' ) ); ?></h2><p class="brand__text"><?php echo nl2br( esc_html( carpediem_setting( 'brand_text' ) ) ); ?></p><a class="text-link" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">История бренда ↗</a></div>
+	</div></div>
 </section>
 
+<section class="community"><div class="container community__inner"><span class="community__symbol" aria-hidden="true">✟</span><h2 class="community__title"><?php echo esc_html( carpediem_setting( 'community_title' ) ); ?></h2><p class="community__text"><?php echo nl2br( esc_html( carpediem_setting( 'community_text' ) ) ); ?></p><?php if ( carpediem_setting( 'telegram' ) ) : ?><a class="btn" href="<?php echo esc_url( carpediem_setting( 'telegram' ) ); ?>" target="_blank" rel="noopener">Мы в Telegram ↗</a><?php else : ?><a class="text-link" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Ближе к бренду ↗</a><?php endif; ?></div></section>
 <?php get_footer(); ?>

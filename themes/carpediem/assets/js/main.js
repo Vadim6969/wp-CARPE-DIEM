@@ -34,7 +34,7 @@
 
 			// Пока меню открыто, Tab не должен уводить фокус на страницу под ним.
 			if ( e.key === 'Tab' ) {
-				var stops = [ burger ].concat( Array.prototype.slice.call( nav.querySelectorAll( 'a[href]' ) ) );
+				var stops = [ burger ].concat( Array.prototype.slice.call( nav.querySelectorAll( 'a[href], button' ) ) );
 				var first = stops[ 0 ];
 				var last = stops[ stops.length - 1 ];
 
@@ -67,12 +67,7 @@
 		return;
 	}
 
-	var COLORS = {
-		'чёрный': '#141416',
-		'чёрный / коричневый': 'linear-gradient(135deg, #141416 50%, #6b4a2f 50%)',
-		'графит': '#3a3a40',
-		'серебро': '#c9c9cf'
-	};
+	var colors = window.carpediemUI ? window.carpediemUI.colors : {};
 
 	var groups = [];
 
@@ -93,8 +88,9 @@
 
 			if ( isColor ) {
 				btn.title = option.textContent;
-				btn.innerHTML = '<span class="swatch__dot"></span><span class="screen-reader-text">' + option.textContent + '</span>';
-				btn.firstChild.style.background = COLORS[ option.textContent.trim().toLowerCase() ] || '#26262b';
+				btn.innerHTML = '<span class="swatch__dot"></span><span class="screen-reader-text"></span>';
+				btn.lastChild.textContent = option.textContent;
+				btn.firstChild.style.background = colors[ option.value ] || '#888888';
 			} else {
 				btn.textContent = option.textContent;
 			}
@@ -136,43 +132,32 @@
 	sync();
 } )();
 
-/* Корзина: кнопки − / + меняют количество и сразу пересчитывают корзину. */
+/* Делегирование сохраняет обработчики после замены формы WooCommerce. */
 ( function () {
 	'use strict';
-
-	var form = document.querySelector( '.woocommerce-cart-form' );
-	if ( ! form ) {
-		return;
-	}
-
-	form.addEventListener( 'click', function ( e ) {
-		var btn = e.target.closest( '.js-qty' );
-		if ( ! btn ) {
-			return;
-		}
-
+	document.addEventListener( 'click', function ( e ) {
+		var btn = e.target.closest( '.woocommerce-cart-form .js-qty' );
+		if ( ! btn ) { return; }
 		var input = btn.parentNode.querySelector( '.qty__input' );
-		var step = parseInt( btn.dataset.step, 10 );
-		var min = parseInt( input.min, 10 ) || 0;
-		var max = input.max ? parseInt( input.max, 10 ) : Infinity;
-		var next = ( parseInt( input.value, 10 ) || 0 ) + step;
-
-		if ( next < min || next > max ) {
-			return;
-		}
-
+		var step = Number( input.step ) || 1;
+		var next = Number( input.value ) + Number( btn.dataset.step ) * step;
+		if ( next < Number( input.min ) || ( input.max && next > Number( input.max ) ) ) { return; }
 		input.value = next;
 		input.dispatchEvent( new Event( 'change', { bubbles: true } ) );
-		form.querySelector( '.js-update-cart' ).click();
 	} );
+	document.addEventListener( 'change', function ( e ) {
+		if ( ! e.target.matches( '.woocommerce-cart-form .qty__input' ) || ! e.target.reportValidity() ) { return; }
+		var form = e.target.closest( 'form' );
+		var update = form.querySelector( '.js-update-cart' );
+		update.disabled = false;
+		update.click();
+	} );
+	if ( window.jQuery ) {
+		window.jQuery( document.body ).on( 'updated_cart_totals removed_from_cart', function () {
+			window.jQuery( document.body ).trigger( 'wc_fragment_refresh' );
+		} );
+	}
 } )();
-
-/* Корзина обновилась — обновляем счётчик в шапке. */
-if ( window.jQuery ) {
-	window.jQuery( document.body ).on( 'updated_cart_totals removed_from_cart', function () {
-		window.jQuery( document.body ).trigger( 'wc_fragment_refresh' );
-	} );
-}
 
 /* «Купить в 1 клик»: нативный <dialog> + отправка в admin-ajax. */
 ( function () {
@@ -246,8 +231,8 @@ if ( window.jQuery ) {
 ( function () {
 	'use strict';
 
-	var btn = document.querySelector( '.js-theme-toggle' );
-	if ( ! btn ) {
+	var buttons = document.querySelectorAll( '.js-theme-toggle' );
+	if ( ! buttons.length ) {
 		return;
 	}
 
@@ -255,7 +240,7 @@ if ( window.jQuery ) {
 
 	function apply( theme ) {
 		root.setAttribute( 'data-theme', theme );
-		btn.setAttribute( 'aria-pressed', String( theme === 'light' ) );
+		buttons.forEach( function ( btn ) { btn.setAttribute( 'aria-pressed', String( theme === 'light' ) ); } );
 		try {
 			localStorage.setItem( 'cd-theme', theme );
 		} catch ( e ) {}
@@ -263,8 +248,8 @@ if ( window.jQuery ) {
 
 	apply( root.getAttribute( 'data-theme' ) === 'light' ? 'light' : 'dark' );
 
-	btn.addEventListener( 'click', function () {
-		apply( root.getAttribute( 'data-theme' ) === 'light' ? 'dark' : 'light' );
+	buttons.forEach( function ( btn ) {
+		btn.addEventListener( 'click', function () { apply( root.getAttribute( 'data-theme' ) === 'light' ? 'dark' : 'light' ); } );
 	} );
 } )();
 
@@ -289,35 +274,33 @@ if ( window.jQuery ) {
 		} catch ( e ) {}
 	}
 
-	// Кнопка на странице товара
-	var toggle = document.querySelector( '.js-fav-toggle' );
-
-	if ( toggle ) {
-		var id = parseInt( toggle.dataset.id, 10 );
-
-		var paint = function () {
-			var saved = read().indexOf( id ) > -1;
+	function paint() {
+		var ids = read();
+		document.querySelectorAll( '.js-fav-toggle' ).forEach( function ( toggle ) {
+			var saved = ids.indexOf( Number( toggle.dataset.id ) ) > -1;
 			toggle.setAttribute( 'aria-pressed', String( saved ) );
-			toggle.querySelector( '.js-fav-icon' ).innerHTML = saved ? '&#9829;' : '&#9825;';
+			toggle.setAttribute( 'aria-label', saved ? 'Убрать из избранного' : 'В избранное' );
+			toggle.querySelector( '.js-fav-icon' ).textContent = saved ? '♥' : '♡';
 			toggle.querySelector( '.js-fav-label' ).textContent = saved ? 'В избранном' : 'В избранное';
-		};
-
-		toggle.addEventListener( 'click', function () {
-			var ids = read();
-			var at = ids.indexOf( id );
-
-			if ( at > -1 ) {
-				ids.splice( at, 1 );
-			} else {
-				ids.unshift( id );
-			}
-
-			write( ids );
-			paint();
 		} );
-
-		paint();
 	}
+	document.addEventListener( 'click', function ( e ) {
+		var toggle = e.target.closest( '.js-fav-toggle' );
+		if ( ! toggle ) { return; }
+		var id = Number( toggle.dataset.id );
+		var ids = read();
+		var at = ids.indexOf( id );
+		if ( at > -1 ) { ids.splice( at, 1 ); } else { ids.unshift( id ); }
+		write( ids );
+		paint();
+		if ( page && at > -1 ) {
+			var card = toggle.closest( 'li.product' );
+			if ( card ) { card.remove(); }
+			empty.hidden = !!list.querySelector( 'li.product' );
+		}
+	} );
+	window.addEventListener( 'storage', function ( e ) { if ( e.key === KEY ) { paint(); } } );
+	paint();
 
 	// Страница «Избранное»
 	var page = document.querySelector( '.js-favorites' );
@@ -340,9 +323,18 @@ if ( window.jQuery ) {
 					if ( res && res.success && res.data.count ) {
 						list.innerHTML = res.data.html;
 						empty.hidden = true;
+						paint();
 					}
 				} )
 				.catch( function () {} );
 		}
 	}
 } )();
+
+/* Размерная сетка остаётся доступной, даже если покупатель свернул раздел. */
+document.addEventListener( 'click', function ( e ) {
+	if ( e.target.closest( '.size-guide-link' ) ) {
+		var table = document.getElementById( 'product-sizes' );
+		if ( table ) { table.open = true; }
+	}
+} );

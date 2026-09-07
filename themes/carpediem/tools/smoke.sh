@@ -35,7 +35,10 @@ check /favorites/
 check /my-account/
 check "/?s=%D1%85%D1%83%D0%B4%D0%B8"
 check /about/
+check /contacts/
 check /delivery/
+check /returns/
+check /size-guide/
 check /oferta/
 check /privacy-policy/
 check /wp-sitemap.xml
@@ -48,6 +51,15 @@ if [ "$count" -lt 1 ]; then
 	FAILED=1
 else
 	printf '  ✓ %-46s товаров на странице=%s\n' "каталог не пустой" "$count"
+fi
+
+# Даже при пустой выдаче покупатель должен видеть фильтры и возможность сбросить их.
+empty_result=$(curl -s -L "$BASE/catalog/?max_price=100")
+if ! printf '%s' "$empty_result" | grep -q 'class="filters"' || ! printf '%s' "$empty_result" | grep -q 'class="filters__reset"'; then
+	echo "  ✗ фильтры или сброс пропали в пустой выдаче"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "фильтры доступны в пустой выдаче"
 fi
 
 if [ "$FAILED" = "0" ]; then

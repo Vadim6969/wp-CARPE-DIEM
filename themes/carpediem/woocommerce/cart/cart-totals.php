@@ -1,95 +1,40 @@
 <?php
-/**
- * Панель «Ваш заказ» справа от таблицы корзины.
- * Основано на шаблоне WooCommerce (cart/cart-totals.php).
- *
- * @package carpediem
+/** Итоги корзины. Структура таблицы совместима с доставкой и AJAX WooCommerce.
+ * @version 2.3.6
  */
-
 defined( 'ABSPATH' ) || exit;
-
 $cart = WC()->cart;
 ?>
 <div class="cart_totals summary-panel <?php echo $cart->has_calculated_shipping() ? 'calculated_shipping' : ''; ?>">
-
 	<?php do_action( 'woocommerce_before_cart_totals' ); ?>
-
 	<h2 class="summary-panel__title">Ваш заказ</h2>
-
-	<div class="summary-row">
-		<span>Товары (<?php echo esc_html( $cart->get_cart_contents_count() ); ?>)</span>
-		<span class="summary-row__val"><?php wc_cart_totals_subtotal_html(); ?></span>
-	</div>
-
-	<div class="summary-row">
-		<span>Доставка</span>
-		<span class="summary-row__val">
-			<?php if ( $cart->needs_shipping() && $cart->show_shipping() ) : ?>
-				<?php wc_cart_totals_shipping_html(); ?>
-			<?php else : ?>
-				<span class="summary-row__dash">—</span>
-			<?php endif; ?>
-		</span>
-	</div>
-	<?php if ( ! ( $cart->needs_shipping() && $cart->show_shipping() ) ) : ?>
-		<p class="summary-note">Рассчитывается на следующем шаге</p>
-	<?php endif; ?>
-
-	<div class="summary-row">
-		<span>Скидка по промокоду</span>
-		<span class="summary-row__val">
-			<?php if ( $cart->get_coupons() ) : ?>
-				<?php foreach ( $cart->get_coupons() as $code => $coupon ) : ?>
-					<span class="summary-coupon">
-						<?php wc_cart_totals_coupon_html( $coupon ); ?>
-					</span>
-				<?php endforeach; ?>
-			<?php else : ?>
-				<span class="summary-row__dash">—</span>
-			<?php endif; ?>
-		</span>
-	</div>
-
+	<table class="summary-table"><tbody>
+		<tr><th>Товары (<?php echo esc_html( $cart->get_cart_contents_count() ); ?>)</th><td><?php wc_cart_totals_subtotal_html(); ?></td></tr>
+		<?php if ( $cart->needs_shipping() && $cart->show_shipping() ) : ?>
+			<?php do_action( 'woocommerce_cart_totals_before_shipping' ); wc_cart_totals_shipping_html(); do_action( 'woocommerce_cart_totals_after_shipping' ); ?>
+		<?php elseif ( $cart->needs_shipping() ) : ?>
+			<tr><th>Доставка</th><td>Рассчитывается при оформлении</td></tr>
+		<?php endif; ?>
+		<?php foreach ( $cart->get_coupons() as $code => $coupon ) : ?><tr class="cart-discount"><th><?php wc_cart_totals_coupon_label( $coupon ); ?></th><td><?php wc_cart_totals_coupon_html( $coupon ); ?></td></tr><?php endforeach; ?>
+		<?php foreach ( $cart->get_fees() as $fee ) : ?><tr><th><?php echo esc_html( $fee->name ); ?></th><td><?php wc_cart_totals_fee_html( $fee ); ?></td></tr><?php endforeach; ?>
+		<?php if ( wc_tax_enabled() && ! $cart->display_prices_including_tax() ) : ?>
+			<?php if ( 'itemized' === get_option( 'woocommerce_tax_total_display' ) ) : ?>
+				<?php foreach ( $cart->get_tax_totals() as $tax ) : ?><tr><th><?php echo esc_html( $tax->label ); ?></th><td><?php echo wp_kses_post( $tax->formatted_amount ); ?></td></tr><?php endforeach; ?>
+			<?php else : ?><tr><th><?php echo esc_html( WC()->countries->tax_or_vat() ); ?></th><td><?php wc_cart_totals_taxes_total_html(); ?></td></tr><?php endif; ?>
+		<?php endif; ?>
+		<?php do_action( 'woocommerce_cart_totals_before_order_total' ); ?>
+		<tr class="summary-table__total"><th>Итого</th><td><?php wc_cart_totals_order_total_html(); ?></td></tr>
+		<?php do_action( 'woocommerce_cart_totals_after_order_total' ); ?>
+	</tbody></table>
 	<?php if ( wc_coupons_enabled() ) : ?>
-		<form class="coupon-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
-			<label class="screen-reader-text" for="coupon_code">Промокод</label>
-			<input type="text" name="coupon_code" id="coupon_code" class="coupon-form__input" placeholder="Промокод">
+		<details class="coupon-details"><summary>Есть промокод?</summary><form class="coupon-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
+			<label class="screen-reader-text" for="coupon_code">Промокод</label><input type="text" name="coupon_code" id="coupon_code" class="coupon-form__input" placeholder="Промокод">
 			<button type="submit" class="coupon-form__btn" name="apply_coupon" value="Применить">Применить</button>
-			<?php wp_nonce_field( 'woocommerce-cart', 'woocommerce-cart-nonce' ); ?>
-		</form>
+			<input type="hidden" name="woocommerce-cart-nonce" value="<?php echo esc_attr( wp_create_nonce( 'woocommerce-cart' ) ); ?>">
+		</form></details>
 	<?php endif; ?>
-
-	<?php foreach ( $cart->get_fees() as $fee ) : ?>
-		<div class="summary-row">
-			<span><?php echo esc_html( $fee->name ); ?></span>
-			<span class="summary-row__val"><?php wc_cart_totals_fee_html( $fee ); ?></span>
-		</div>
-	<?php endforeach; ?>
-
-	<?php do_action( 'woocommerce_cart_totals_before_order_total' ); ?>
-
-	<div class="summary-total">
-		<span>Итого <span class="summary-total__cur"><?php echo esc_html( get_woocommerce_currency() ); ?></span></span>
-		<span class="summary-total__val"><?php wc_cart_totals_order_total_html(); ?></span>
-	</div>
-
-	<?php do_action( 'woocommerce_cart_totals_after_order_total' ); ?>
-
-	<div class="wc-proceed-to-checkout">
-		<?php do_action( 'woocommerce_proceed_to_checkout' ); ?>
-	</div>
-
-	<a class="btn btn--ghost summary-panel__continue" href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">Продолжить покупки</a>
-
-	<div class="pay-methods">
-		<span class="pay-methods__title">Мы принимаем</span>
-		<ul class="pay-methods__list">
-			<?php foreach ( array( 'Visa', 'MasterCard', 'МИР', 'SBP' ) as $method ) : ?>
-				<li><?php echo esc_html( $method ); ?></li>
-			<?php endforeach; ?>
-		</ul>
-	</div>
-
+	<div class="wc-proceed-to-checkout"><?php do_action( 'woocommerce_proceed_to_checkout' ); ?></div>
+	<a class="text-link summary-panel__continue" href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">Продолжить покупки ↗</a>
+	<p class="summary-payment-note">Способ оплаты можно выбрать при оформлении заказа.</p>
 	<?php do_action( 'woocommerce_after_cart_totals' ); ?>
-
 </div>

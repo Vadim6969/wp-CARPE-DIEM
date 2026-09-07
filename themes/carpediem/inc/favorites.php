@@ -11,12 +11,14 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Кнопка на странице товара (подменяет заглушку в prod-actions).
  */
-function carpediem_favorite_button( $product_id ) {
+function carpediem_favorite_button( $product_id, $compact = false ) {
 	printf(
-		'<button class="prod-actions__btn js-fav-toggle" type="button" data-id="%d" aria-pressed="false">
-			<span class="js-fav-icon" aria-hidden="true">&#9825;</span> <span class="js-fav-label">В избранное</span>
+		'<button class="prod-actions__btn js-fav-toggle %2$s" type="button" data-id="%1$d" aria-pressed="false" aria-label="В избранное">
+			<span class="js-fav-icon" aria-hidden="true">&#9825;</span> <span class="js-fav-label %3$s">В избранное</span>
 		</button>',
-		(int) $product_id
+		(int) $product_id,
+		$compact ? 'loop-favorite' : '',
+		$compact ? 'screen-reader-text' : ''
 	);
 }
 

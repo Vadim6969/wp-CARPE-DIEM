@@ -138,7 +138,31 @@
 
 	var filters = document.querySelector( '.filters' );
 	var ordering = document.querySelector( '.woocommerce-ordering' );
-	if ( ! filters || ! ordering || ! filters.parentNode || ! ordering.parentNode ) {
+	if ( ! filters || ! filters.parentNode ) {
+		return;
+	}
+	var summary = filters.querySelector( '.filters__summary' );
+	var toggle = null;
+	var mounted = false;
+
+	document.addEventListener( 'keydown', function ( e ) {
+		if ( filters.open && e.key === 'Escape' ) {
+			filters.open = false;
+			if ( mounted && toggle ) {
+				syncToggle();
+				toggle.focus();
+			} else if ( summary ) {
+				summary.focus();
+			}
+		}
+	} );
+	document.addEventListener( 'click', function ( e ) {
+		if ( ! mounted && filters.open && ! filters.contains( e.target ) ) {
+			filters.open = false;
+		}
+	} );
+
+	if ( ! ordering || ! ordering.parentNode ) {
 		return;
 	}
 
@@ -150,9 +174,8 @@
 	var media = window.matchMedia( '(max-width: 699px)' );
 	var marker = document.createComment( 'catalog-ordering' );
 	var toolbar = document.createElement( 'div' );
-	var toggle = document.createElement( 'button' );
+	toggle = document.createElement( 'button' );
 	var initiallyOpen = filters.open;
-	var mounted = false;
 	var originalLabels = Array.prototype.map.call( select.options, function ( option ) {
 		return option.textContent;
 	} );
@@ -176,8 +199,10 @@
 	toolbar.appendChild( toggle );
 
 	function syncToggle() {
-		var active = Boolean( filters.querySelector( '.filters__badge' ) );
-		toggle.textContent = active ? 'Фильтры •' : 'Фильтры';
+		var active = filters.getAttribute( 'data-active' ) === 'true';
+		toggle.textContent = 'Фильтры';
+		toggle.classList.toggle( 'has-active-filters', active );
+		toggle.setAttribute( 'aria-label', active ? 'Фильтры, есть выбранные параметры' : 'Фильтры' );
 		toggle.setAttribute( 'aria-expanded', String( filters.open ) );
 	}
 
@@ -220,13 +245,6 @@
 	} );
 
 	filters.addEventListener( 'toggle', syncToggle );
-	document.addEventListener( 'keydown', function ( e ) {
-		if ( mounted && filters.open && e.key === 'Escape' ) {
-			filters.open = false;
-			syncToggle();
-			toggle.focus();
-		}
-	} );
 
 	if ( media.addEventListener ) {
 		media.addEventListener( 'change', mount );

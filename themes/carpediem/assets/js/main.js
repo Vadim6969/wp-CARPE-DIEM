@@ -132,6 +132,249 @@
 	sync();
 } )();
 
+/* Мобильная панель каталога: фильтры и сортировка остаются доступны при прокрутке. */
+( function () {
+	'use strict';
+
+	var filters = document.querySelector( '.filters' );
+	var ordering = document.querySelector( '.woocommerce-ordering' );
+	if ( ! filters || ! ordering || ! filters.parentNode || ! ordering.parentNode ) {
+		return;
+	}
+
+	var select = ordering.querySelector( 'select' );
+	if ( ! select ) {
+		return;
+	}
+
+	var media = window.matchMedia( '(max-width: 699px)' );
+	var marker = document.createComment( 'catalog-ordering' );
+	var toolbar = document.createElement( 'div' );
+	var toggle = document.createElement( 'button' );
+	var initiallyOpen = filters.open;
+	var mounted = false;
+	var originalLabels = Array.prototype.map.call( select.options, function ( option ) {
+		return option.textContent;
+	} );
+	var shortLabels = {
+		menu_order: 'По умолчанию',
+		popularity: 'Популярные',
+		rating: 'По рейтингу',
+		date: 'Новинки',
+		price: 'Сначала дешевле',
+		'price-desc': 'Сначала дороже'
+	};
+
+	ordering.parentNode.insertBefore( marker, ordering );
+	toolbar.className = 'catalog-mobile-toolbar';
+	toolbar.setAttribute( 'role', 'group' );
+	toolbar.setAttribute( 'aria-label', 'Управление каталогом' );
+	toggle.className = 'catalog-mobile-toolbar__filters';
+	toggle.type = 'button';
+	toggle.setAttribute( 'aria-controls', filters.id );
+	select.setAttribute( 'aria-label', 'Сортировка товаров' );
+	toolbar.appendChild( toggle );
+
+	function syncToggle() {
+		var active = Boolean( filters.querySelector( '.filters__badge' ) );
+		toggle.textContent = active ? 'Фильтры •' : 'Фильтры';
+		toggle.setAttribute( 'aria-expanded', String( filters.open ) );
+	}
+
+	function setShortLabels( short ) {
+		Array.prototype.forEach.call( select.options, function ( option, index ) {
+			option.textContent = short && shortLabels[ option.value ] ? shortLabels[ option.value ] : originalLabels[ index ];
+		} );
+	}
+
+	function mount() {
+		if ( media.matches && ! mounted ) {
+			filters.open = false;
+			filters.classList.add( 'is-mobile-enhanced' );
+			filters.parentNode.insertBefore( toolbar, filters );
+			toolbar.appendChild( ordering );
+			setShortLabels( true );
+			mounted = true;
+		} else if ( ! media.matches && mounted ) {
+			filters.classList.remove( 'is-mobile-enhanced' );
+			filters.open = initiallyOpen;
+			marker.parentNode.insertBefore( ordering, marker.nextSibling );
+			toolbar.remove();
+			setShortLabels( false );
+			mounted = false;
+		}
+		syncToggle();
+	}
+
+	toggle.addEventListener( 'click', function () {
+		filters.open = ! filters.open;
+		if ( filters.open ) {
+			window.requestAnimationFrame( function () {
+				filters.scrollIntoView( {
+					block: 'start',
+					behavior: window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ? 'auto' : 'smooth'
+				} );
+			} );
+		}
+		syncToggle();
+	} );
+
+	filters.addEventListener( 'toggle', syncToggle );
+	document.addEventListener( 'keydown', function ( e ) {
+		if ( mounted && filters.open && e.key === 'Escape' ) {
+			filters.open = false;
+			syncToggle();
+			toggle.focus();
+		}
+	} );
+
+	if ( media.addEventListener ) {
+		media.addEventListener( 'change', mount );
+	} else {
+		media.addListener( mount );
+	}
+	mount();
+} )();
+
+/* Доступное состояние покупки и компактная sticky-кнопка на мобильной карточке товара. */
+( function () {
+	'use strict';
+
+	var addButton = document.querySelector( '.single-product .single_add_to_cart_button' );
+	if ( ! addButton ) {
+		return;
+	}
+
+	var media = window.matchMedia( '(max-width: 699px)' );
+	var header = document.querySelector( '.js-header' );
+	var endSection = document.querySelector( '.usp' );
+	var purchaseForm = addButton.closest( 'form' );
+	var productNameSource = document.querySelector( '.single-product .product_title' );
+	var summaryPrice = document.querySelector( '.single-product .summary > .price' );
+	var variationWrap = document.querySelector( '.single_variation_wrap' );
+	var bar = document.createElement( 'aside' );
+	var meta = document.createElement( 'span' );
+	var name = document.createElement( 'span' );
+	var price = document.createElement( 'strong' );
+	var stickyButton = document.createElement( 'button' );
+	var scheduled = false;
+
+	bar.className = 'sticky-purchase';
+	bar.hidden = true;
+	bar.setAttribute( 'aria-label', 'Быстрая покупка' );
+	meta.className = 'sticky-purchase__meta';
+	name.className = 'sticky-purchase__name';
+	price.className = 'sticky-purchase__price';
+	price.setAttribute( 'aria-live', 'polite' );
+	stickyButton.className = 'btn btn--primary sticky-purchase__button';
+	stickyButton.type = 'button';
+	stickyButton.textContent = addButton.textContent.trim();
+	name.textContent = productNameSource ? productNameSource.textContent.trim() : document.title;
+	meta.appendChild( name );
+	meta.appendChild( price );
+	bar.appendChild( meta );
+	bar.appendChild( stickyButton );
+	document.body.appendChild( bar );
+
+	function isUnavailable() {
+		return addButton.classList.contains( 'disabled' ) || addButton.classList.contains( 'wc-variation-selection-needed' );
+	}
+
+	function syncPrice() {
+		var variationPrice = document.querySelector( '.single_variation .woocommerce-variation-price .price' );
+		var source = variationPrice && variationPrice.textContent.trim() ? variationPrice : summaryPrice;
+		price.textContent = source ? source.textContent.trim().replace( /\s+/g, ' ' ) : '';
+	}
+
+	function sync() {
+		scheduled = false;
+		var unavailable = isUnavailable();
+		var headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+		var passedMainButton = addButton.getBoundingClientRect().bottom <= headerBottom + 8;
+		var reachedEnd = endSection && endSection.getBoundingClientRect().top < window.innerHeight;
+		var dialogOpen = Boolean( document.querySelector( 'dialog[open]' ) );
+		var visible = media.matches && ! unavailable && passedMainButton && ! reachedEnd && ! dialogOpen;
+
+		addButton.disabled = unavailable;
+		addButton.setAttribute( 'aria-disabled', String( unavailable ) );
+		stickyButton.disabled = unavailable;
+		bar.hidden = ! visible;
+		document.body.classList.toggle( 'sticky-purchase-visible', visible );
+		syncPrice();
+	}
+
+	function scheduleSync() {
+		if ( scheduled ) {
+			return;
+		}
+		scheduled = true;
+		window.requestAnimationFrame( sync );
+	}
+
+	stickyButton.addEventListener( 'click', function () {
+		if ( ! stickyButton.disabled ) {
+			addButton.click();
+		}
+	} );
+	window.addEventListener( 'scroll', scheduleSync, { passive: true } );
+	window.addEventListener( 'resize', scheduleSync );
+	if ( purchaseForm ) {
+		purchaseForm.addEventListener( 'change', scheduleSync );
+	}
+
+	new MutationObserver( scheduleSync ).observe( addButton, { attributes: true, attributeFilter: [ 'class' ] } );
+	if ( variationWrap ) {
+		new MutationObserver( scheduleSync ).observe( variationWrap, { childList: true, subtree: true } );
+	}
+	Array.prototype.forEach.call( document.querySelectorAll( 'dialog' ), function ( dialog ) {
+		new MutationObserver( scheduleSync ).observe( dialog, { attributes: true, attributeFilter: [ 'open' ] } );
+	} );
+
+	if ( window.jQuery && purchaseForm ) {
+		window.jQuery( purchaseForm ).on( 'found_variation show_variation hide_variation reset_data woocommerce_variation_has_changed', scheduleSync );
+	}
+	if ( media.addEventListener ) {
+		media.addEventListener( 'change', scheduleSync );
+	} else {
+		media.addListener( scheduleSync );
+	}
+	sync();
+} )();
+
+/* Для PhotoSwipe достаточно aria-haspopup и доступного имени; aria-controls даёт ложный axe incomplete. */
+( function () {
+	'use strict';
+	var attributeObserver;
+	var discoveryObserver;
+	var bind = function () {
+		var trigger = document.querySelector( '.woocommerce-product-gallery__trigger' );
+		if ( ! trigger ) {
+			return false;
+		}
+		var cleanControls = function () {
+			if ( trigger.hasAttribute( 'aria-controls' ) ) {
+				trigger.removeAttribute( 'aria-controls' );
+			}
+		};
+		if ( ! attributeObserver ) {
+			attributeObserver = new MutationObserver( cleanControls );
+			attributeObserver.observe( trigger, { attributes: true, attributeFilter: [ 'aria-controls' ] } );
+		}
+		cleanControls();
+		return true;
+	};
+
+	if ( ! bind() ) {
+		discoveryObserver = new MutationObserver( function () {
+			if ( bind() ) {
+				discoveryObserver.disconnect();
+			}
+		} );
+		discoveryObserver.observe( document.body, { childList: true, subtree: true } );
+	}
+	window.addEventListener( 'load', bind );
+} )();
+
 /* Делегирование сохраняет обработчики после замены формы WooCommerce. */
 ( function () {
 	'use strict';

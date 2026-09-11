@@ -49,7 +49,7 @@ $density     = array_filter( (array) $density, fn( $v ) => '—' !== $v );
 			<details class="info-col" id="product-sizes" open>
 				<summary class="info-col__title">Таблица размеров</summary>
 				<div class="info-col__body">
-					<div class="size-table__scroll">
+					<div class="size-table__scroll" role="region" aria-label="Таблица размеров" tabindex="0">
 						<table class="size-table">
 							<thead>
 								<tr><?php foreach ( $sizes['head'] as $th ) : ?><th><?php echo esc_html( $th ); ?></th><?php endforeach; ?></tr>

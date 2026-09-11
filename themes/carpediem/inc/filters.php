@@ -108,7 +108,7 @@ function carpediem_filters_bar() {
 	// Сохраняем контекст страницы (категорию, поиск) — форма шлёт GET на текущий адрес.
 	$action = is_product_category() || is_product_tag() ? get_term_link( get_queried_object() ) : wc_get_page_permalink( 'shop' );
 	?>
-	<details class="filters" <?php echo carpediem_has_active_filters() ? 'open' : ''; ?>>
+	<details class="filters" id="catalog-filters" <?php echo carpediem_has_active_filters() ? 'open' : ''; ?>>
 		<summary class="filters__summary">
 			Фильтры
 			<?php if ( carpediem_has_active_filters() ) : ?>

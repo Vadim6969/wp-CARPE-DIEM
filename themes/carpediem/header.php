@@ -10,7 +10,7 @@
 <?php wp_body_open(); ?>
 
 <a class="skip-link" href="#content">Перейти к содержимому</a>
-<?php if ( carpediem_setting( 'announcement' ) ) : ?><div class="announcement"><?php echo esc_html( carpediem_setting( 'announcement' ) ); ?></div><?php endif; ?>
+<?php if ( carpediem_setting( 'announcement' ) ) : ?><div class="announcement" role="region" aria-label="Объявление магазина"><?php echo esc_html( carpediem_setting( 'announcement' ) ); ?></div><?php endif; ?>
 
 <header class="site-header js-header">
 	<div class="container site-header__inner">

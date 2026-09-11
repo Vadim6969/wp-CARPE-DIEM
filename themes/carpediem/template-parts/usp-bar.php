@@ -27,7 +27,7 @@ $items = array(
 	),
 );
 ?>
-<section class="usp">
+<section class="usp" aria-label="Преимущества магазина">
 	<div class="container usp__grid">
 		<?php foreach ( $items as $item ) : ?>
 			<div class="usp__item">

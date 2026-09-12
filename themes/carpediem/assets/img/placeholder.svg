@@ -16,5 +16,5 @@
 		<path d="M300 500l-6-12 6-12 6 12z"/>
 		<path d="M258 356h84"/>
 	</g>
-	<text x="300" y="430" fill="url(#mark)" font-family="Georgia, 'Times New Roman', serif" font-size="86" text-anchor="middle" letter-spacing="-8">CD</text>
+	<text x="300" y="430" fill="url(#mark)" font-family="Manrope, Arial, sans-serif" font-size="86" text-anchor="middle" letter-spacing="-8">CD</text>
 </svg>

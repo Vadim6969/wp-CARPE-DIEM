@@ -12,7 +12,7 @@
 		<path d="M600 411v150"/>
 		<path d="M540 455h120"/>
 	</g>
-	<text x="600" y="585" fill="#d9d4cc" font-family="Georgia, 'Times New Roman', serif" font-size="120" text-anchor="middle" letter-spacing="-8">CD</text>
-	<text x="600" y="705" fill="#ffffff" font-family="Georgia, 'Times New Roman', serif" font-size="72" text-anchor="middle" letter-spacing="14">CARPE DIEM</text>
-	<text x="600" y="765" fill="#94949a" font-family="Helvetica, Arial, sans-serif" font-size="24" text-anchor="middle" letter-spacing="16">2026 · STYLE OF SOUL</text>
+	<text x="600" y="585" fill="#d9d4cc" font-family="Manrope, Arial, sans-serif" font-size="120" text-anchor="middle" letter-spacing="-8">CD</text>
+	<text x="600" y="705" fill="#ffffff" font-family="Manrope, Arial, sans-serif" font-size="72" text-anchor="middle" letter-spacing="14">CARPE DIEM</text>
+	<text x="600" y="765" fill="#94949a" font-family="Manrope, Arial, sans-serif" font-size="24" text-anchor="middle" letter-spacing="16">2026 · STYLE OF SOUL</text>
 </svg>

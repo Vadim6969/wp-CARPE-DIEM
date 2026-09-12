@@ -25,7 +25,7 @@ $class = isset( $args['class'] ) ? $args['class'] : '';
 	</g>
 
 	<text x="70" y="122" fill="url(#cd-silver)"
-		font-family="'Cormorant Garamond', 'Times New Roman', serif"
+		font-family="Manrope, -apple-system, 'Segoe UI', sans-serif"
 		font-size="86" font-weight="400" letter-spacing="-10"
 		text-anchor="middle">CD</text>
 </svg>

@@ -30,7 +30,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	// ponytail: шрифты с Google CDN. Перед запуском положить .woff2 в assets/fonts/ и раздавать со своего домена.
 	wp_enqueue_style(
 		'carpediem-fonts',
-		'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Manrope:wght@200;300;400;500&display=swap',
+		'https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500&display=swap',
 		array(),
 		null
 	);

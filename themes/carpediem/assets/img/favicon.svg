@@ -6,5 +6,5 @@
 		<path d="M256 472l-18-30 18-30 18 30z"/>
 		<path d="M150 150h212"/>
 	</g>
-	<text x="256" y="330" fill="#e8e6e3" font-family="Georgia, 'Times New Roman', serif" font-size="230" text-anchor="middle" letter-spacing="-20">CD</text>
+	<text x="256" y="330" fill="#e8e6e3" font-family="Manrope, Arial, sans-serif" font-size="230" text-anchor="middle" letter-spacing="-20">CD</text>
 </svg>

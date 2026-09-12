@@ -58,7 +58,7 @@ add_filter( 'woocommerce_product_variation_title_include_attributes', '__return_
 
 /* ---------- Карточка в сетке ---------- */
 
-// Кнопку «в корзину» из сетки убираем — покупка идёт со страницы товара (нужен размер).
+// Стандартную кнопку Woo заменяем своей: она учитывает необходимость выбора вариации.
 remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10 );
 
 // Над названием — категория, как на макете.
@@ -92,6 +92,50 @@ add_action( 'woocommerce_after_shop_loop_item', function () {
 	}
 	if ( $sizes ) { echo '<p class="loop-sizes"><span class="screen-reader-text">Доступные размеры: </span>' . esc_html( implode( ' · ', array_unique( $sizes ) ) ) . '</p>'; }
 }, 15 );
+
+/**
+ * Понятное действие в каждой карточке каталога.
+ * Простой товар добавляется сразу, для вариативного сначала открывается выбор размера/цвета.
+ */
+function carpediem_loop_purchase_button() {
+	global $product;
+
+	if ( ! $product instanceof WC_Product || ! $product->is_visible() ) {
+		return;
+	}
+
+	$name = wp_strip_all_tags( $product->get_name() );
+
+	if ( $product->is_type( 'simple' ) && $product->is_purchasable() && $product->is_in_stock() ) {
+		$classes = array( 'button', 'btn', 'btn--primary', 'loop-buy', 'product_type_simple', 'add_to_cart_button' );
+		if ( $product->supports( 'ajax_add_to_cart' ) ) {
+			$classes[] = 'ajax_add_to_cart';
+		}
+
+		printf(
+			'<a href="%1$s" data-quantity="1" class="%2$s" data-product_id="%3$d" data-product_sku="%4$s" aria-label="%5$s" rel="nofollow"><span>В корзину</span><span aria-hidden="true">+</span></a>',
+			esc_url( $product->add_to_cart_url() ),
+			esc_attr( implode( ' ', $classes ) ),
+			absint( $product->get_id() ),
+			esc_attr( $product->get_sku() ),
+			esc_attr( sprintf( 'Добавить «%s» в корзину', $name ) )
+		);
+		return;
+	}
+
+	$available = $product->is_purchasable() && $product->is_in_stock();
+	$url       = $product->get_permalink() . ( $available ? '#product-buy' : '' );
+	$label     = $available ? 'Купить' : 'Подробнее';
+	$aria      = $available ? sprintf( 'Выбрать параметры и купить «%s»', $name ) : sprintf( 'Подробнее о товаре «%s»', $name );
+
+	printf(
+		'<a class="button btn btn--primary loop-buy loop-buy--select" href="%1$s" aria-label="%2$s"><span>%3$s</span><span aria-hidden="true">→</span></a>',
+		esc_url( $url ),
+		esc_attr( $aria ),
+		esc_html( $label )
+	);
+}
+add_action( 'woocommerce_after_shop_loop_item', 'carpediem_loop_purchase_button', 25 );
 
 add_action( 'woocommerce_before_variations_form', function () {
 	global $product;
@@ -127,6 +171,45 @@ add_filter( 'nav_menu_link_attributes', function ( $attrs, $item, $args ) {
 }, 10, 3 );
 
 /* ---------- Страница товара ---------- */
+
+// Якорь для кнопки «Купить» из каталога — сразу к выбору параметров и действиям.
+add_action( 'woocommerce_before_add_to_cart_form', function () {
+	echo '<span id="product-buy" class="product-buy-anchor" aria-hidden="true"></span>';
+}, 5 );
+
+/**
+ * «Купить сейчас» оформляет выбранный вариант без промежуточного визита в корзину.
+ * Сама корзина не очищается: уже выбранные покупателем товары остаются в заказе.
+ */
+function carpediem_buy_now_button() {
+	global $product;
+
+	if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+		return;
+	}
+
+	$action   = add_query_arg( 'buy-now', '1', $product->get_permalink() );
+	$disabled = $product->is_type( 'variable' ) ? ' disabled aria-disabled="true"' : '';
+
+	printf(
+		'<button type="submit" name="add-to-cart" value="%1$d" formaction="%2$s" class="button alt btn btn--primary carpediem-buy-now"%3$s>Купить сейчас</button>',
+		absint( $product->get_id() ),
+		esc_url( $action ),
+		$disabled // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- статический набор атрибутов.
+	);
+}
+add_action( 'woocommerce_before_add_to_cart_button', 'carpediem_buy_now_button', 5 );
+
+add_filter( 'woocommerce_add_to_cart_redirect', function ( $url ) {
+	$buy_now = isset( $_REQUEST['buy-now'] ) ? wc_clean( wp_unslash( $_REQUEST['buy-now'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- флаг навигации, данные не меняет.
+
+	if ( '1' === $buy_now ) {
+		wc_clear_notices();
+		return wc_get_checkout_url();
+	}
+
+	return $url;
+} );
 
 add_action( 'wp', function () {
 	if ( ! is_product() ) {
@@ -236,21 +319,73 @@ function carpediem_cross_sells() {
 
 /* ---------- Оформление заказа ---------- */
 
+// Короткое пояснение перед формой: checkout остаётся гостевым и помещается на одной странице.
+add_action( 'woocommerce_before_checkout_form', function () {
+	if ( is_wc_endpoint_url( 'order-received' ) || ! WC()->cart ) {
+		return;
+	}
+	?>
+	<section class="checkout-fast-intro" aria-label="Быстрое оформление заказа">
+		<div>
+			<span class="checkout-fast-intro__eyebrow">Быстрое оформление</span>
+			<strong>Без регистрации</strong>
+			<p>Контакты, доставка и подтверждение — на одной странице.</p>
+		</div>
+		<a href="#order_review"><?php echo esc_html( WC()->cart->get_cart_contents_count() ); ?> шт. · <?php echo wp_kses_post( WC()->cart->get_total() ); ?></a>
+	</section>
+	<?php
+}, 5 );
+
 // Согласие на обработку персональных данных (152-ФЗ) — обязательная галочка.
 add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 	$privacy_url = get_privacy_policy_url();
-	$label       = 'Согласен на обработку персональных данных';
+	$label       = '<span class="consent-row__copy">Согласен на обработку персональных данных';
 
 	if ( $privacy_url ) {
 		$label .= sprintf( ' (<a href="%s" target="_blank" rel="noopener">политика конфиденциальности</a>)', esc_url( $privacy_url ) );
 	}
+	$label .= '</span>';
 
-	$fields['order']['carpediem_consent'] = array(
+	// Оставляем только поля, без которых нельзя связаться с покупателем и доставить заказ.
+	foreach ( array( 'billing_last_name', 'billing_company', 'billing_address_2', 'billing_state', 'billing_postcode' ) as $key ) {
+		unset( $fields['billing'][ $key ] );
+	}
+	unset( $fields['order']['order_comments'] );
+
+	$fields['billing']['billing_country']['type']     = 'hidden';
+	$fields['billing']['billing_country']['label']    = '';
+	$fields['billing']['billing_country']['class']    = array( 'checkout-hidden-field' );
+	$fields['billing']['billing_country']['default']  = 'RU';
+	$fields['billing']['billing_country']['required'] = false;
+	$fields['billing']['billing_country']['priority'] = 5;
+
+	$fields['billing']['billing_first_name']['label']       = 'Имя';
+	$fields['billing']['billing_first_name']['placeholder'] = 'Как к вам обращаться';
+	$fields['billing']['billing_first_name']['priority']    = 10;
+
+	$fields['billing']['billing_phone']['label']       = 'Телефон';
+	$fields['billing']['billing_phone']['placeholder'] = '+7 900 000-00-00';
+	$fields['billing']['billing_phone']['priority']    = 20;
+
+	$fields['billing']['billing_email']['label']       = 'Email';
+	$fields['billing']['billing_email']['placeholder'] = 'Для чека и статуса заказа';
+	$fields['billing']['billing_email']['required']    = false;
+	$fields['billing']['billing_email']['priority']    = 30;
+
+	$fields['billing']['billing_city']['label']       = 'Город';
+	$fields['billing']['billing_city']['placeholder'] = 'Населённый пункт';
+	$fields['billing']['billing_city']['priority']    = 40;
+
+	$fields['billing']['billing_address_1']['label']       = 'Адрес доставки';
+	$fields['billing']['billing_address_1']['placeholder'] = 'Улица, дом, квартира';
+	$fields['billing']['billing_address_1']['priority']    = 50;
+
+	$fields['billing']['carpediem_consent'] = array(
 		'type'     => 'checkbox',
 		'label'    => $label,
 		'required' => true,
 		'class'    => array( 'form-row-wide', 'consent-row' ),
-		'priority' => 200,
+		'priority' => 90,
 	);
 
 	// Телефон обязателен, компания не нужна — это же настроено и в опциях Woo.
@@ -261,8 +396,26 @@ add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 	return $fields;
 } );
 
+// Примечание к заказу убрано из короткой формы вместе с пустым блоком «Детали».
+add_filter( 'woocommerce_enable_order_notes_field', '__return_false' );
+add_filter( 'default_checkout_billing_country', fn() => 'RU' );
+
+// Woo переводит этот заголовок как «Оплата и доставка», хотя блок теперь содержит контакты и адрес.
+add_filter( 'gettext', function ( $translation, $text, $domain ) {
+	$billing_heading = in_array( $text, array( 'Billing & Shipping', 'Billing &amp; Shipping' ), true ) || 'Оплата и доставка' === $translation;
+	if ( 'woocommerce' === $domain && is_checkout() && $billing_heading ) {
+		return 'Контакты и доставка';
+	}
+
+	return $translation;
+}, 10, 3 );
+
 // Фиксируем факт согласия в заказе: дата и IP — это и есть доказательство по 152-ФЗ.
 add_action( 'woocommerce_checkout_create_order', function ( $order, $data ) {
+	if ( ! $order->get_billing_country() ) {
+		$order->set_billing_country( 'RU' );
+	}
+
 	if ( ! empty( $data['carpediem_consent'] ) ) {
 		$order->update_meta_data( '_carpediem_consent', current_time( 'mysql' ) );
 		$order->update_meta_data( '_carpediem_consent_ip', carpediem_client_ip() );

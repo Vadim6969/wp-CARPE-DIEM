@@ -58,6 +58,35 @@
 	}
 } )();
 
+/* Ссылка «Купить» из каталога попадает к форме после загрузки всех изображений товара. */
+( function () {
+	'use strict';
+
+	if ( window.location.hash !== '#product-buy' ) {
+		return;
+	}
+
+	var target = document.getElementById( 'product-buy' );
+	if ( ! target ) {
+		return;
+	}
+
+	var alignPurchaseForm = function () {
+		var root = document.documentElement;
+		var previousBehavior = root.style.scrollBehavior;
+		root.style.scrollBehavior = 'auto';
+		target.scrollIntoView( { block: 'start' } );
+		root.style.scrollBehavior = previousBehavior;
+	};
+
+	if ( document.readyState === 'complete' ) {
+		alignPurchaseForm();
+	} else {
+		window.addEventListener( 'load', alignPurchaseForm, { once: true } );
+	}
+	window.setTimeout( alignPurchaseForm, 300 );
+} )();
+
 /* Свотчи вариаций: кнопки размеров и цветов поверх нативных select'ов Woo. */
 ( function () {
 	'use strict';
@@ -262,6 +291,7 @@
 	if ( ! addButton ) {
 		return;
 	}
+	var primaryButton = document.querySelector( '.single-product .carpediem-buy-now' ) || addButton;
 
 	var media = window.matchMedia( '(max-width: 699px)' );
 	var header = document.querySelector( '.js-header' );
@@ -286,7 +316,7 @@
 	price.setAttribute( 'aria-live', 'polite' );
 	stickyButton.className = 'btn btn--primary sticky-purchase__button';
 	stickyButton.type = 'button';
-	stickyButton.textContent = addButton.textContent.trim();
+	stickyButton.textContent = primaryButton.textContent.trim();
 	name.textContent = productNameSource ? productNameSource.textContent.trim() : document.title;
 	meta.appendChild( name );
 	meta.appendChild( price );
@@ -315,6 +345,8 @@
 
 		addButton.disabled = unavailable;
 		addButton.setAttribute( 'aria-disabled', String( unavailable ) );
+		primaryButton.disabled = unavailable;
+		primaryButton.setAttribute( 'aria-disabled', String( unavailable ) );
 		stickyButton.disabled = unavailable;
 		bar.hidden = ! visible;
 		document.body.classList.toggle( 'sticky-purchase-visible', visible );
@@ -331,7 +363,7 @@
 
 	stickyButton.addEventListener( 'click', function () {
 		if ( ! stickyButton.disabled ) {
-			addButton.click();
+			primaryButton.click();
 		}
 	} );
 	window.addEventListener( 'scroll', scheduleSync, { passive: true } );
@@ -596,5 +628,18 @@ document.addEventListener( 'click', function ( e ) {
 	if ( e.target.closest( '.size-guide-link' ) ) {
 		var table = document.getElementById( 'product-sizes' );
 		if ( table ) { table.open = true; }
+	}
+} );
+
+/* В checkout весь вариант доставки является большой кликабельной целью. */
+document.addEventListener( 'click', function ( e ) {
+	var option = e.target.closest( '.woocommerce-checkout-review-order-table ul#shipping_method li' );
+	if ( ! option || e.target.closest( 'input, label' ) ) {
+		return;
+	}
+
+	var radio = option.querySelector( 'input[type="radio"]' );
+	if ( radio && ! radio.checked ) {
+		radio.click();
 	}
 } );

@@ -18,7 +18,7 @@ add_action( 'wp', function () {
 } );
 
 function carpediem_one_click_button() {
-	echo '<button type="button" class="btn btn--ghost one-click__open js-one-click-open">Купить в 1 клик</button>';
+	echo '<button type="button" class="btn btn--ghost one-click__open js-one-click-open">Быстрый заказ по телефону</button>';
 }
 
 // Диалог в подвале страницы товара.
@@ -31,7 +31,7 @@ add_action( 'wp_footer', function () {
 	?>
 	<dialog class="one-click" id="one-click" data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
 		<form class="one-click__form js-one-click-form" method="dialog">
-			<h2 class="one-click__title">Купить в 1 клик</h2>
+			<h2 class="one-click__title">Быстрый заказ</h2>
 			<p class="one-click__text">Оставь имя и телефон — перезвоним, подтвердим размер и доставку.</p>
 
 			<label class="one-click__label" for="oc-name">Имя</label>

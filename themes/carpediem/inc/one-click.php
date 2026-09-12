@@ -18,7 +18,7 @@ add_action( 'wp', function () {
 } );
 
 function carpediem_one_click_button() {
-	echo '<button type="button" class="btn btn--ghost one-click__open js-one-click-open">Быстрый заказ по телефону</button>';
+	echo '<button type="button" class="btn btn--ghost one-click__open js-one-click-open">' . esc_html( carpediem_setting( 'quick_order_button_label' ) ) . '</button>';
 }
 
 // Диалог в подвале страницы товара.
@@ -31,26 +31,26 @@ add_action( 'wp_footer', function () {
 	?>
 	<dialog class="one-click" id="one-click" data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
 		<form class="one-click__form js-one-click-form" method="dialog">
-			<h2 class="one-click__title">Быстрый заказ</h2>
-			<p class="one-click__text">Оставь имя и телефон — перезвоним, подтвердим размер и доставку.</p>
+			<h2 class="one-click__title"><?php echo esc_html( carpediem_setting( 'quick_order_title' ) ); ?></h2>
+			<p class="one-click__text"><?php echo esc_html( carpediem_setting( 'quick_order_text' ) ); ?></p>
 
-			<label class="one-click__label" for="oc-name">Имя</label>
+			<label class="one-click__label" for="oc-name"><?php echo esc_html( carpediem_setting( 'quick_order_name_label' ) ); ?></label>
 			<input class="one-click__input" type="text" id="oc-name" name="name" required maxlength="60" autocomplete="name">
 
-			<label class="one-click__label" for="oc-phone">Телефон</label>
+			<label class="one-click__label" for="oc-phone"><?php echo esc_html( carpediem_setting( 'quick_order_phone_label' ) ); ?></label>
 			<input class="one-click__input" type="tel" id="oc-phone" name="phone" required maxlength="20" placeholder="+7 900 000-00-00" autocomplete="tel">
 
 			<label class="one-click__consent">
 				<input type="checkbox" name="consent" required>
-				<span>Согласен на обработку персональных данных<?php if ( $privacy_url ) : ?>
+				<span><?php echo esc_html( carpediem_setting( 'quick_order_consent_label' ) ); ?><?php if ( $privacy_url ) : ?>
 					(<a href="<?php echo esc_url( $privacy_url ); ?>" target="_blank" rel="noopener">политика</a>)<?php endif; ?>.</span>
 			</label>
 
 			<p class="one-click__error js-one-click-error" role="alert" hidden></p>
 
 			<div class="one-click__actions">
-				<button type="submit" class="btn js-one-click-submit" formmethod="dialog">Отправить</button>
-				<button type="button" class="one-click__cancel js-one-click-close">Отмена</button>
+				<button type="submit" class="btn js-one-click-submit" formmethod="dialog"><?php echo esc_html( carpediem_setting( 'quick_order_submit_label' ) ); ?></button>
+				<button type="button" class="one-click__cancel js-one-click-close"><?php echo esc_html( carpediem_setting( 'quick_order_cancel_label' ) ); ?></button>
 			</div>
 
 			<input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'carpediem_one_click' ) ); ?>">

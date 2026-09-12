@@ -16,6 +16,8 @@
 .cd-panel h2 { font-size: 18px; line-height: 1.4; margin: 0 0 10px; font-weight: 600; }
 .cd-panel p { font-size: 13px; color: #646660; line-height: 1.7; margin: 0 0 16px; }
 .cd-panel__fields { display: grid; gap: 24px; }
+.cd-panel--copy .cd-panel__fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
+.cd-panel--copy .cd-field--textarea { grid-column: 1 / -1; }
 .cd-field > label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
 .cd-field input:not([type=checkbox]):not([type=hidden]), .cd-field textarea { width: 100%; max-width: none; padding: 9px 12px; border: 1px solid #bfc2ba; border-radius: 2px; font-size: 14px; }
 .cd-field .description { margin: 8px 0 0; font-size: 12px; }
@@ -68,6 +70,8 @@
 	.cd-admin__header h1 { font-size: 25px; }
 	.cd-admin__tabs { gap: 24px; }
 	.cd-panel { display: block; padding: 20px; }
+	.cd-panel--copy .cd-panel__fields { grid-template-columns: 1fr; }
+	.cd-panel--copy .cd-field--textarea { grid-column: auto; }
 	.cd-panel__intro { margin-bottom: 24px; }
 	.cd-stats, .cd-guide { grid-template-columns: 1fr; }
 	.cd-stat { gap: 8px; }

@@ -44,6 +44,22 @@ add_action( 'woocommerce_after_main_content', function () {
 	echo '</div>';
 }, 10 );
 
+// Оставляем штатную точку расширения корзины, меняем только текст основной кнопки.
+add_action( 'wp', function () {
+	if ( is_cart() ) {
+		remove_action( 'woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to_checkout', 20 );
+		add_action( 'woocommerce_proceed_to_checkout', 'carpediem_button_proceed_to_checkout', 20 );
+	}
+} );
+
+function carpediem_button_proceed_to_checkout() {
+	printf(
+		'<a href="%1$s" class="checkout-button button alt wc-forward">%2$s</a>',
+		esc_url( wc_get_checkout_url() ),
+		esc_html( carpediem_setting( 'cart_checkout_label' ) )
+	);
+}
+
 // Разделитель хлебных крошек.
 add_filter( 'woocommerce_breadcrumb_defaults', function ( $args ) {
 	$args['delimiter']   = ' <span class="crumbs__sep">/</span> ';
@@ -74,7 +90,7 @@ add_action( 'woocommerce_shop_loop_item_title', function () {
 function carpediem_new_badge() {
 	global $product;
 	if ( $product && has_term( 'новинка', 'product_tag', $product->get_id() ) ) {
-		echo '<span class="badge-new">Новинка</span>';
+		echo '<span class="badge-new">' . esc_html( carpediem_setting( 'product_new_label' ) ) . '</span>';
 	}
 }
 add_action( 'woocommerce_before_shop_loop_item_title', 'carpediem_new_badge', 15 );
@@ -113,19 +129,20 @@ function carpediem_loop_purchase_button() {
 		}
 
 		printf(
-			'<a href="%1$s" data-quantity="1" class="%2$s" data-product_id="%3$d" data-product_sku="%4$s" aria-label="%5$s" rel="nofollow"><span>В корзину</span><span aria-hidden="true">+</span></a>',
+			'<a href="%1$s" data-quantity="1" class="%2$s" data-product_id="%3$d" data-product_sku="%4$s" aria-label="%5$s" rel="nofollow"><span>%6$s</span><span aria-hidden="true">+</span></a>',
 			esc_url( $product->add_to_cart_url() ),
 			esc_attr( implode( ' ', $classes ) ),
 			absint( $product->get_id() ),
 			esc_attr( $product->get_sku() ),
-			esc_attr( sprintf( 'Добавить «%s» в корзину', $name ) )
+			esc_attr( sprintf( 'Добавить «%s» в корзину', $name ) ),
+			esc_html( carpediem_setting( 'catalog_add_to_cart_label' ) )
 		);
 		return;
 	}
 
 	$available = $product->is_purchasable() && $product->is_in_stock();
 	$url       = $product->get_permalink() . ( $available ? '#product-buy' : '' );
-	$label     = $available ? 'Купить' : 'Подробнее';
+	$label     = $available ? carpediem_setting( 'catalog_buy_label' ) : carpediem_setting( 'catalog_details_label' );
 	$aria      = $available ? sprintf( 'Выбрать параметры и купить «%s»', $name ) : sprintf( 'Подробнее о товаре «%s»', $name );
 
 	printf(
@@ -139,14 +156,14 @@ add_action( 'woocommerce_after_shop_loop_item', 'carpediem_loop_purchase_button'
 
 add_action( 'woocommerce_before_variations_form', function () {
 	global $product;
-	if ( carpediem_size_table( $product ) ) { echo '<a class="size-guide-link" href="#product-sizes">Таблица размеров ↗</a>'; }
+	if ( carpediem_size_table( $product ) ) { echo '<a class="size-guide-link" href="#product-sizes">' . esc_html( carpediem_setting( 'product_size_guide_label' ) ) . ' ↗</a>'; }
 } );
 
 add_action( 'woocommerce_single_product_summary', function () {
 	echo '<div class="product-service">';
-	foreach ( array( 'delivery' => array( 'Доставка', 'delivery_note' ), 'returns' => array( 'Обмен и возврат', 'returns_note' ) ) as $path => $item ) {
+	foreach ( array( 'delivery' => array( 'product_delivery_label', 'delivery_note' ), 'returns' => array( 'product_returns_label', 'returns_note' ) ) as $path => $item ) {
 		if ( carpediem_setting( $item[1] ) ) {
-			echo '<a href="' . esc_url( home_url( '/' . $path . '/' ) ) . '"><strong>' . esc_html( $item[0] ) . ' ↗</strong><span>' . esc_html( carpediem_setting( $item[1] ) ) . '</span></a>';
+			echo '<a href="' . esc_url( home_url( '/' . $path . '/' ) ) . '"><strong>' . esc_html( carpediem_setting( $item[0] ) ) . ' ↗</strong><span>' . esc_html( carpediem_setting( $item[1] ) ) . '</span></a>';
 		}
 	}
 	echo '</div>';
@@ -155,7 +172,7 @@ add_action( 'woocommerce_single_product_summary', function () {
 add_action( 'woocommerce_archive_description', function () {
 	$terms = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true, 'parent' => 0, 'exclude' => array( get_option( 'default_product_cat' ) ) ) );
 	if ( is_wp_error( $terms ) || ! $terms ) { return; }
-	echo '<nav class="catalog-categories" aria-label="Категории товаров"><a href="' . esc_url( wc_get_page_permalink( 'shop' ) ) . '"' . ( is_shop() ? ' aria-current="page"' : '' ) . '>Все вещи</a>';
+	echo '<nav class="catalog-categories" aria-label="Категории товаров"><a href="' . esc_url( wc_get_page_permalink( 'shop' ) ) . '"' . ( is_shop() ? ' aria-current="page"' : '' ) . '>' . esc_html( carpediem_setting( 'catalog_all_label' ) ) . '</a>';
 	foreach ( $terms as $term ) {
 		echo '<a href="' . esc_url( get_term_link( $term ) ) . '"' . ( is_product_category( $term->slug ) ? ' aria-current="page"' : '' ) . '>' . esc_html( $term->name ) . '</a>';
 	}
@@ -192,13 +209,18 @@ function carpediem_buy_now_button() {
 	$disabled = $product->is_type( 'variable' ) ? ' disabled aria-disabled="true"' : '';
 
 	printf(
-		'<button type="submit" name="add-to-cart" value="%1$d" formaction="%2$s" class="button alt btn btn--primary carpediem-buy-now"%3$s>Купить сейчас</button>',
+		'<button type="submit" name="add-to-cart" value="%1$d" formaction="%2$s" class="button alt btn btn--primary carpediem-buy-now"%3$s>%4$s</button>',
 		absint( $product->get_id() ),
 		esc_url( $action ),
-		$disabled // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- статический набор атрибутов.
+		$disabled, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- статический набор атрибутов.
+		esc_html( carpediem_setting( 'product_buy_now_label' ) )
 	);
 }
 add_action( 'woocommerce_before_add_to_cart_button', 'carpediem_buy_now_button', 5 );
+
+add_filter( 'woocommerce_product_single_add_to_cart_text', function () {
+	return carpediem_setting( 'catalog_add_to_cart_label' );
+} );
 
 add_filter( 'woocommerce_add_to_cart_redirect', function ( $url ) {
 	$buy_now = isset( $_REQUEST['buy-now'] ) ? wc_clean( wp_unslash( $_REQUEST['buy-now'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- флаг навигации, данные не меняет.
@@ -267,8 +289,9 @@ function carpediem_product_actions() {
 	echo '<div class="prod-actions">';
 	carpediem_favorite_button( $product->get_id() );
 	printf(
-		'<a class="prod-actions__btn" href="%s" target="_blank" rel="noopener"><span aria-hidden="true">&#8599;</span> Поделиться</a>',
-		esc_url( 'https://t.me/share/url?url=' . rawurlencode( get_permalink( $product->get_id() ) ) )
+		'<a class="prod-actions__btn" href="%s" target="_blank" rel="noopener"><span aria-hidden="true">&#8599;</span> %s</a>',
+		esc_url( 'https://t.me/share/url?url=' . rawurlencode( get_permalink( $product->get_id() ) ) ),
+		esc_html( carpediem_setting( 'product_share_label' ) )
 	);
 	echo '</div>';
 }
@@ -300,7 +323,7 @@ function carpediem_cross_sells() {
 	?>
 	<section class="section cross-sells">
 		<div class="container">
-			<h2 class="section-title">С этим товаром покупают</h2>
+			<h2 class="section-title"><?php echo esc_html( carpediem_setting( 'product_related_label' ) ); ?></h2>
 			<div class="products-scroller">
 				<ul class="products columns-5">
 					<?php
@@ -325,11 +348,11 @@ add_action( 'woocommerce_before_checkout_form', function () {
 		return;
 	}
 	?>
-	<section class="checkout-fast-intro" aria-label="Быстрое оформление заказа">
+	<section class="checkout-fast-intro" aria-label="<?php echo esc_attr( carpediem_setting( 'checkout_intro_eyebrow' ) ); ?>">
 		<div>
-			<span class="checkout-fast-intro__eyebrow">Быстрое оформление</span>
-			<strong>Без регистрации</strong>
-			<p>Контакты, доставка и подтверждение — на одной странице.</p>
+			<span class="checkout-fast-intro__eyebrow"><?php echo esc_html( carpediem_setting( 'checkout_intro_eyebrow' ) ); ?></span>
+			<strong><?php echo esc_html( carpediem_setting( 'checkout_intro_title' ) ); ?></strong>
+			<p><?php echo esc_html( carpediem_setting( 'checkout_intro_text' ) ); ?></p>
 		</div>
 		<a href="#order_review"><?php echo esc_html( WC()->cart->get_cart_contents_count() ); ?> шт. · <?php echo wp_kses_post( WC()->cart->get_total() ); ?></a>
 	</section>
@@ -339,7 +362,7 @@ add_action( 'woocommerce_before_checkout_form', function () {
 // Согласие на обработку персональных данных (152-ФЗ) — обязательная галочка.
 add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 	$privacy_url = get_privacy_policy_url();
-	$label       = '<span class="consent-row__copy">Согласен на обработку персональных данных';
+	$label       = '<span class="consent-row__copy">' . esc_html( carpediem_setting( 'checkout_consent_label' ) );
 
 	if ( $privacy_url ) {
 		$label .= sprintf( ' (<a href="%s" target="_blank" rel="noopener">политика конфиденциальности</a>)', esc_url( $privacy_url ) );
@@ -359,25 +382,25 @@ add_filter( 'woocommerce_checkout_fields', function ( $fields ) {
 	$fields['billing']['billing_country']['required'] = false;
 	$fields['billing']['billing_country']['priority'] = 5;
 
-	$fields['billing']['billing_first_name']['label']       = 'Имя';
-	$fields['billing']['billing_first_name']['placeholder'] = 'Как к вам обращаться';
+	$fields['billing']['billing_first_name']['label']       = carpediem_setting( 'checkout_name_label' );
+	$fields['billing']['billing_first_name']['placeholder'] = carpediem_setting( 'checkout_name_placeholder' );
 	$fields['billing']['billing_first_name']['priority']    = 10;
 
-	$fields['billing']['billing_phone']['label']       = 'Телефон';
-	$fields['billing']['billing_phone']['placeholder'] = '+7 900 000-00-00';
+	$fields['billing']['billing_phone']['label']       = carpediem_setting( 'checkout_phone_label' );
+	$fields['billing']['billing_phone']['placeholder'] = carpediem_setting( 'checkout_phone_placeholder' );
 	$fields['billing']['billing_phone']['priority']    = 20;
 
-	$fields['billing']['billing_email']['label']       = 'Email';
-	$fields['billing']['billing_email']['placeholder'] = 'Для чека и статуса заказа';
+	$fields['billing']['billing_email']['label']       = carpediem_setting( 'checkout_email_label' );
+	$fields['billing']['billing_email']['placeholder'] = carpediem_setting( 'checkout_email_placeholder' );
 	$fields['billing']['billing_email']['required']    = false;
 	$fields['billing']['billing_email']['priority']    = 30;
 
-	$fields['billing']['billing_city']['label']       = 'Город';
-	$fields['billing']['billing_city']['placeholder'] = 'Населённый пункт';
+	$fields['billing']['billing_city']['label']       = carpediem_setting( 'checkout_city_label' );
+	$fields['billing']['billing_city']['placeholder'] = carpediem_setting( 'checkout_city_placeholder' );
 	$fields['billing']['billing_city']['priority']    = 40;
 
-	$fields['billing']['billing_address_1']['label']       = 'Адрес доставки';
-	$fields['billing']['billing_address_1']['placeholder'] = 'Улица, дом, квартира';
+	$fields['billing']['billing_address_1']['label']       = carpediem_setting( 'checkout_address_label' );
+	$fields['billing']['billing_address_1']['placeholder'] = carpediem_setting( 'checkout_address_placeholder' );
 	$fields['billing']['billing_address_1']['priority']    = 50;
 
 	$fields['billing']['carpediem_consent'] = array(
@@ -404,11 +427,19 @@ add_filter( 'default_checkout_billing_country', fn() => 'RU' );
 add_filter( 'gettext', function ( $translation, $text, $domain ) {
 	$billing_heading = in_array( $text, array( 'Billing & Shipping', 'Billing &amp; Shipping' ), true ) || 'Оплата и доставка' === $translation;
 	if ( 'woocommerce' === $domain && is_checkout() && $billing_heading ) {
-		return 'Контакты и доставка';
+		return carpediem_setting( 'checkout_contact_heading' );
+	}
+	$order_heading = 'Your order' === $text || 'Ваш заказ' === $translation;
+	if ( 'woocommerce' === $domain && is_checkout() && $order_heading ) {
+		return carpediem_setting( 'checkout_order_heading' );
 	}
 
 	return $translation;
 }, 10, 3 );
+
+add_filter( 'woocommerce_order_button_text', function () {
+	return carpediem_setting( 'checkout_place_order_label' );
+} );
 
 // Фиксируем факт согласия в заказе: дата и IP — это и есть доказательство по 152-ФЗ.
 add_action( 'woocommerce_checkout_create_order', function ( $order, $data ) {

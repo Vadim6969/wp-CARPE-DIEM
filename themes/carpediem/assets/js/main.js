@@ -229,9 +229,10 @@
 
 	function syncToggle() {
 		var active = filters.getAttribute( 'data-active' ) === 'true';
-		toggle.textContent = 'Фильтры';
+		var filtersLabel = ( window.carpediemUI && window.carpediemUI.catalogFiltersLabel ) || 'Фильтры';
+		toggle.textContent = filtersLabel;
 		toggle.classList.toggle( 'has-active-filters', active );
-		toggle.setAttribute( 'aria-label', active ? 'Фильтры, есть выбранные параметры' : 'Фильтры' );
+		toggle.setAttribute( 'aria-label', active ? filtersLabel + ', есть выбранные параметры' : filtersLabel );
 		toggle.setAttribute( 'aria-expanded', String( filters.open ) );
 	}
 
@@ -502,19 +503,21 @@
 			.then( function ( r ) { return r.json(); } )
 			.then( function ( res ) {
 				if ( res && res.success ) {
-					form.innerHTML = '<h2 class="one-click__title">Готово</h2><p class="one-click__text">' + res.data.message +
-						'</p><button type="button" class="btn js-one-click-done">Закрыть</button>';
+					var successTitle = ( window.carpediemUI && window.carpediemUI.quickOrderSuccessTitle ) || 'Готово';
+					var closeLabel = ( window.carpediemUI && window.carpediemUI.quickOrderCloseLabel ) || 'Закрыть';
+					form.innerHTML = '<h2 class="one-click__title">' + successTitle + '</h2><p class="one-click__text">' + res.data.message +
+						'</p><button type="button" class="btn js-one-click-done">' + closeLabel + '</button>';
 					form.querySelector( '.js-one-click-done' ).addEventListener( 'click', function () {
 						dialog.close();
 						window.location.reload();
 					} );
 				} else {
-					showError( ( res && res.data && res.data.message ) || 'Не получилось отправить. Попробуй ещё раз.' );
+					showError( ( res && res.data && res.data.message ) || ( window.carpediemUI && window.carpediemUI.quickOrderGenericError ) || 'Не получилось отправить. Попробуйте ещё раз.' );
 					submit.disabled = false;
 				}
 			} )
 			.catch( function () {
-				showError( 'Сеть недоступна. Попробуй ещё раз.' );
+				showError( ( window.carpediemUI && window.carpediemUI.quickOrderNetworkError ) || 'Сеть недоступна. Попробуйте ещё раз.' );
 				submit.disabled = false;
 			} );
 	} );

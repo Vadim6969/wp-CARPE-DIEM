@@ -25,6 +25,49 @@ function carpediem_admin_sections() {
 			'telegram' => array( 'Telegram', 'url' ), 'vk' => array( 'ВКонтакте', 'url' ), 'instagram' => array( 'Instagram', 'url' ),
 			'delivery_note' => array( 'Коротко о доставке', 'textarea' ), 'returns_note' => array( 'Коротко об обмене и возврате', 'textarea' ),
 		) ),
+		'catalog_copy' => array( 'Каталог', 'Названия кнопок и фильтров, которые покупатель видит в списке товаров.', array(
+			'catalog_all_label' => array( 'Все товары', 'text' ), 'catalog_filters_label' => array( 'Кнопка фильтров', 'text' ),
+			'catalog_filter_apply_label' => array( 'Применить фильтры', 'text' ), 'catalog_filter_reset_label' => array( 'Сбросить фильтры', 'text' ),
+			'catalog_filter_clear_label' => array( 'Очистить активные фильтры', 'text' ), 'catalog_add_to_cart_label' => array( 'Добавить простой товар', 'text' ),
+			'catalog_buy_label' => array( 'Выбрать и купить', 'text' ), 'catalog_details_label' => array( 'Недоступный товар', 'text' ),
+		) ),
+		'product_copy' => array( 'Карточка товара', 'Основные действия и информационные блоки на странице вещи.', array(
+			'product_new_label' => array( 'Бейдж нового товара', 'text' ), 'product_buy_now_label' => array( 'Основная кнопка покупки', 'text' ),
+			'product_size_guide_label' => array( 'Ссылка на размеры', 'text' ), 'product_related_label' => array( 'Заголовок рекомендаций', 'text' ),
+			'product_delivery_label' => array( 'Ссылка на доставку', 'text' ), 'product_returns_label' => array( 'Ссылка на возврат', 'text' ),
+			'product_share_label' => array( 'Поделиться', 'text' ), 'product_description_label' => array( 'Описание', 'text' ),
+			'product_materials_label' => array( 'Материалы и уход', 'text' ), 'product_material_label' => array( 'Состав', 'text' ),
+			'product_density_label' => array( 'Плотность', 'text' ), 'product_sizes_label' => array( 'Таблица размеров', 'text' ),
+			'product_size_note' => array( 'Примечание под размерами', 'text' ),
+		) ),
+		'quick_order_copy' => array( 'Заказ по телефону', 'Тексты короткой заявки для покупателя, которому удобнее звонок.', array(
+			'quick_order_button_label' => array( 'Кнопка на товаре', 'text' ), 'quick_order_title' => array( 'Заголовок окна', 'text' ),
+			'quick_order_text' => array( 'Пояснение', 'textarea' ), 'quick_order_name_label' => array( 'Поле имени', 'text' ),
+			'quick_order_phone_label' => array( 'Поле телефона', 'text' ), 'quick_order_consent_label' => array( 'Согласие на обработку данных', 'text' ),
+			'quick_order_submit_label' => array( 'Отправить заявку', 'text' ), 'quick_order_cancel_label' => array( 'Отмена', 'text' ),
+			'quick_order_success_title' => array( 'Заявка отправлена', 'text' ), 'quick_order_close_label' => array( 'Закрыть окно', 'text' ),
+			'quick_order_generic_error' => array( 'Ошибка отправки', 'text' ), 'quick_order_network_error' => array( 'Ошибка сети', 'text' ),
+		) ),
+		'checkout_copy' => array( 'Оформление заказа', 'Короткие и однозначные формулировки для страницы оформления.', array(
+			'checkout_intro_eyebrow' => array( 'Подпись вводного блока', 'text' ), 'checkout_intro_title' => array( 'Заголовок вводного блока', 'text' ),
+			'checkout_intro_text' => array( 'Пояснение', 'textarea' ), 'checkout_contact_heading' => array( 'Заголовок контактов', 'text' ),
+			'checkout_order_heading' => array( 'Заголовок состава заказа', 'text' ), 'checkout_product_label' => array( 'Колонка товара', 'text' ),
+			'checkout_price_label' => array( 'Колонка цены', 'text' ), 'checkout_items_label' => array( 'Сумма товаров', 'text' ),
+			'checkout_shipping_label' => array( 'Доставка', 'text' ), 'checkout_total_label' => array( 'Итоговая сумма', 'text' ),
+			'checkout_place_order_label' => array( 'Основная кнопка', 'text' ), 'checkout_consent_label' => array( 'Согласие на обработку данных', 'text' ),
+			'checkout_name_label' => array( 'Поле имени', 'text' ), 'checkout_name_placeholder' => array( 'Подсказка имени', 'text' ),
+			'checkout_phone_label' => array( 'Поле телефона', 'text' ), 'checkout_phone_placeholder' => array( 'Подсказка телефона', 'text' ),
+			'checkout_email_label' => array( 'Поле email', 'text' ), 'checkout_email_placeholder' => array( 'Подсказка email', 'text' ),
+			'checkout_city_label' => array( 'Поле города', 'text' ), 'checkout_city_placeholder' => array( 'Подсказка города', 'text' ),
+			'checkout_address_label' => array( 'Поле адреса', 'text' ), 'checkout_address_placeholder' => array( 'Подсказка адреса', 'text' ),
+		) ),
+		'cart_copy' => array( 'Корзина', 'Тексты итогов и перехода к оформлению заказа.', array(
+			'cart_order_heading' => array( 'Заголовок итогов', 'text' ), 'cart_items_label' => array( 'Товары', 'text' ),
+			'cart_shipping_pending_label' => array( 'Доставка ещё не рассчитана', 'text' ), 'cart_total_label' => array( 'Итоговая сумма', 'text' ),
+			'cart_checkout_label' => array( 'Перейти к оформлению', 'text' ), 'cart_continue_label' => array( 'Продолжить покупки', 'text' ),
+			'cart_payment_note' => array( 'Примечание об оплате', 'textarea' ), 'cart_thanks_title' => array( 'Благодарность — заголовок', 'text' ),
+			'cart_thanks_text' => array( 'Благодарность — текст', 'textarea' ),
+		) ),
 	);
 }
 
@@ -91,7 +134,7 @@ function carpediem_admin_field( $key, $field ) {
 	$name = 'carpediem_settings[' . $key . ']';
 	$type = $field[1];
 	?>
-	<div class="cd-field">
+	<div class="cd-field cd-field--<?php echo esc_attr( $type ); ?>">
 		<label for="cd-<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $field[0] ); ?></label>
 		<?php if ( 'textarea' === $type ) : ?>
 			<textarea id="cd-<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $name ); ?>" rows="3"><?php echo esc_textarea( $value ); ?></textarea>
@@ -138,7 +181,11 @@ function carpediem_admin_field( $key, $field ) {
 
 function carpediem_admin_page() {
 	if ( ! current_user_can( 'manage_woocommerce' ) ) { return; }
-	$tabs = array( 'overview' => 'Обзор магазина', 'storefront' => 'Оформление сайта', 'contacts' => 'Контакты и условия', 'guide' => 'Работа с товарами' );
+	$tabs = array( 'overview' => 'Обзор магазина', 'storefront' => 'Оформление сайта', 'copy' => 'Тексты магазина', 'contacts' => 'Контакты и условия', 'guide' => 'Работа с товарами' );
+	$section_tabs = array(
+		'hero' => 'storefront', 'selection' => 'storefront', 'brand' => 'storefront', 'contacts' => 'contacts',
+		'catalog_copy' => 'copy', 'product_copy' => 'copy', 'quick_order_copy' => 'copy', 'checkout_copy' => 'copy', 'cart_copy' => 'copy',
+	);
 	$tab = isset( $_GET['tab'] ) && is_string( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'overview';
 	if ( ! isset( $tabs[ $tab ] ) ) { $tab = 'overview'; }
 	?>
@@ -148,13 +195,13 @@ function carpediem_admin_page() {
 			<?php foreach ( $tabs as $slug => $label ) : ?><a <?php echo $slug === $tab ? 'aria-current="page"' : ''; ?> href="<?php echo esc_url( admin_url( 'admin.php?page=carpediem&tab=' . $slug ) ); ?>"><?php echo esc_html( $label ); ?></a><?php endforeach; ?>
 		</nav>
 		<?php settings_errors( 'carpediem' ); settings_errors( 'carpediem_settings' ); ?>
-		<?php if ( in_array( $tab, array( 'storefront', 'contacts' ), true ) ) : ?>
+		<?php if ( in_array( $tab, array( 'storefront', 'copy', 'contacts' ), true ) ) : ?>
 			<form action="options.php" method="post" class="cd-settings-form">
 				<?php settings_fields( 'carpediem' ); ?>
 				<input type="hidden" name="carpediem_settings[_tab]" value="<?php echo esc_attr( $tab ); ?>">
 				<div class="cd-admin__sections">
-				<?php foreach ( carpediem_admin_sections() as $section => $config ) : if ( ( 'contacts' === $section ) !== ( 'contacts' === $tab ) ) { continue; } ?>
-					<section class="cd-panel"><div class="cd-panel__intro"><h2><?php echo esc_html( $config[0] ); ?></h2><p><?php echo esc_html( $config[1] ); ?></p></div><div class="cd-panel__fields"><?php foreach ( $config[2] as $key => $field ) { carpediem_admin_field( $key, $field ); } ?></div></section>
+				<?php foreach ( carpediem_admin_sections() as $section => $config ) : if ( ( $section_tabs[ $section ] ?? 'storefront' ) !== $tab ) { continue; } ?>
+					<section class="cd-panel <?php echo 'copy' === $tab ? 'cd-panel--copy' : ''; ?>"><div class="cd-panel__intro"><h2><?php echo esc_html( $config[0] ); ?></h2><p><?php echo esc_html( $config[1] ); ?></p></div><div class="cd-panel__fields"><?php foreach ( $config[2] as $key => $field ) { carpediem_admin_field( $key, $field ); } ?></div></section>
 				<?php endforeach; ?>
 				</div>
 				<div class="cd-savebar"><span class="cd-save-status" role="status">Изменения появятся на сайте после сохранения.</span><?php submit_button( 'Сохранить изменения', 'primary', 'submit', false ); ?></div>

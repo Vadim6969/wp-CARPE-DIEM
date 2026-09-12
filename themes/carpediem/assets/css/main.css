@@ -1275,8 +1275,7 @@ select.is-swatched { display: none; }
 	white-space: nowrap;
 	border: 0;
 }
-.woocommerce-checkout-review-order-table .woocommerce-shipping-totals td::before {
-	content: "Доставка";
+.checkout-shipping-title {
 	display: block;
 	margin-bottom: 10px;
 	font-size: 11px;
@@ -1481,17 +1480,24 @@ select.is-swatched { display: none; }
 	font-size: 13px;
 	color: var(--text-dim);
 }
-.one-click__consent input { margin-top: 3px; accent-color: var(--control); }
+.one-click__consent input {
+	flex: 0 0 22px;
+	width: 22px;
+	height: 22px;
+	margin-top: 0;
+	accent-color: var(--control);
+	cursor: pointer;
+}
 .one-click__consent a { text-decoration: underline; text-underline-offset: 3px; }
 .one-click__error { margin-top: calc(var(--step) * 2); font-size: 13px; color: var(--danger); }
 .one-click__actions { display: flex; align-items: center; gap: calc(var(--step) * 2); margin-top: calc(var(--step) * 3); }
 .one-click__actions .btn { flex: 1 1 auto; }
-.one-click__cancel { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-mute); }
+.one-click__cancel { min-height: 44px; padding-inline: 8px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-mute); }
 
 .single-product .one-click__open {
 	justify-self: start;
 	width: auto;
-	min-height: 38px;
+	min-height: 44px;
 	padding-inline: 0;
 	border: 0;
 	border-bottom: 1px solid var(--line-hover);
@@ -2200,6 +2206,7 @@ body.admin-bar .site-header { top: 32px; }
 		align-items: stretch;
 		gap: 10px;
 	}
+	.checkout-fast-intro p { max-width: none; }
 	.checkout-fast-intro > a { align-self: flex-start; }
 	.hero__actions {
 		display: grid;

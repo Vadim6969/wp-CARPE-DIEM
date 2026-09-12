@@ -16,8 +16,8 @@ $show_items_total = WC()->cart->has_discount()
 <table class="shop_table woocommerce-checkout-review-order-table">
 	<thead>
 		<tr>
-			<th class="product-name">Товар</th>
-			<th class="product-total">Цена</th>
+			<th class="product-name"><?php echo esc_html( carpediem_setting( 'checkout_product_label' ) ); ?></th>
+			<th class="product-total"><?php echo esc_html( carpediem_setting( 'checkout_price_label' ) ); ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -65,7 +65,7 @@ $show_items_total = WC()->cart->has_discount()
 	<tfoot>
 		<?php if ( $show_items_total ) : ?>
 			<tr class="cart-subtotal">
-				<th>Товары</th>
+				<th><?php echo esc_html( carpediem_setting( 'checkout_items_label' ) ); ?></th>
 				<td><?php wc_cart_totals_subtotal_html(); ?></td>
 			</tr>
 		<?php endif; ?>
@@ -84,7 +84,14 @@ $show_items_total = WC()->cart->has_discount()
 			wc_cart_totals_shipping_html();
 			$shipping_rows = ob_get_clean();
 			$shipping_rows = preg_replace( '/<th[^>]*>.*?<\/th>/s', '', $shipping_rows );
-			$shipping_rows = preg_replace( '/<td([^>]*)>/', '<td$1 colspan="2"><span class="screen-reader-text">Доставка</span>', $shipping_rows );
+			$shipping_label = esc_html( carpediem_setting( 'checkout_shipping_label' ) );
+			$shipping_rows = preg_replace_callback(
+				'/<td([^>]*)>/',
+				function ( $matches ) use ( $shipping_label ) {
+					return '<td' . $matches[1] . ' colspan="2"><span class="checkout-shipping-title">' . $shipping_label . '</span>';
+				},
+				$shipping_rows
+			);
 			echo $shipping_rows; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- штатная разметка WooCommerce, дополненная colspan.
 			?>
 			<?php do_action( 'woocommerce_review_order_after_shipping' ); ?>
@@ -116,7 +123,7 @@ $show_items_total = WC()->cart->has_discount()
 		<?php do_action( 'woocommerce_review_order_before_order_total' ); ?>
 
 		<tr class="order-total">
-			<th>К оплате</th>
+			<th><?php echo esc_html( carpediem_setting( 'checkout_total_label' ) ); ?></th>
 			<td><?php wc_cart_totals_order_total_html(); ?></td>
 		</tr>
 

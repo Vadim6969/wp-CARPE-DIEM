@@ -142,8 +142,8 @@ do_action( 'woocommerce_before_cart' ); ?>
 		<div class="cart-thanks">
 			<span class="cart-thanks__cross" aria-hidden="true">&#10015;</span>
 			<div>
-				<h2 class="cart-thanks__title">Спасибо за поддержку</h2>
-				<p class="cart-thanks__text">Ты часть нашего комьюнити. Вместе мы создаём стиль и смысл.</p>
+				<h2 class="cart-thanks__title"><?php echo esc_html( carpediem_setting( 'cart_thanks_title' ) ); ?></h2>
+				<p class="cart-thanks__text"><?php echo esc_html( carpediem_setting( 'cart_thanks_text' ) ); ?></p>
 			</div>
 		</div>
 	</form>

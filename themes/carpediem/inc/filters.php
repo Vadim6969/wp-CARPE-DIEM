@@ -175,7 +175,7 @@ function carpediem_filters_bar() {
 	<details class="filters" id="catalog-filters" <?php echo $active_tags ? 'data-active="true"' : ''; ?>>
 		<summary class="filters__summary">
 			<span class="filters__summary-icon" aria-hidden="true"><i></i><i></i><i></i></span>
-			<span class="filters__summary-title">Фильтры</span>
+			<span class="filters__summary-title"><?php echo esc_html( carpediem_setting( 'catalog_filters_label' ) ); ?></span>
 			<span class="filters__summary-action" aria-hidden="true"></span>
 		</summary>
 
@@ -223,9 +223,9 @@ function carpediem_filters_bar() {
 			</fieldset>
 
 			<div class="filters__actions">
-				<button class="btn btn--primary filters__apply" type="submit">Показать товары</button>
+				<button class="btn btn--primary filters__apply" type="submit"><?php echo esc_html( carpediem_setting( 'catalog_filter_apply_label' ) ); ?></button>
 				<?php if ( $active_tags ) : ?>
-					<a class="filters__reset" href="<?php echo esc_url( $filter_url( 'all' ) ); ?>">Сбросить всё</a>
+					<a class="filters__reset" href="<?php echo esc_url( $filter_url( 'all' ) ); ?>"><?php echo esc_html( carpediem_setting( 'catalog_filter_reset_label' ) ); ?></a>
 				<?php endif; ?>
 			</div>
 		</form>
@@ -235,7 +235,7 @@ function carpediem_filters_bar() {
 			<?php foreach ( $active_tags as $tag ) : ?>
 				<a class="filters__tag" href="<?php echo esc_url( $tag[1] ); ?>"><span><?php echo esc_html( $tag[0] ); ?></span><span class="filters__tag-remove" aria-hidden="true">×</span><span class="screen-reader-text">Удалить фильтр</span></a>
 			<?php endforeach; ?>
-			<a class="filters__clear" href="<?php echo esc_url( $filter_url( 'all' ) ); ?>">Очистить</a>
+			<a class="filters__clear" href="<?php echo esc_url( $filter_url( 'all' ) ); ?>"><?php echo esc_html( carpediem_setting( 'catalog_filter_clear_label' ) ); ?></a>
 		</nav>
 	<?php endif; ?>
 	<?php

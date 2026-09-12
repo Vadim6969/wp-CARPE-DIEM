@@ -19,20 +19,20 @@ $density     = array_filter( (array) $density, fn( $v ) => '—' !== $v );
 
 		<?php if ( $description ) : ?>
 			<details class="info-col" open>
-				<summary class="info-col__title">Описание</summary>
+				<summary class="info-col__title"><?php echo esc_html( carpediem_setting( 'product_description_label' ) ); ?></summary>
 				<div class="info-col__body"><?php echo wpautop( wp_kses_post( $description ) ); ?></div>
 			</details>
 		<?php endif; ?>
 
 		<?php if ( $material || $care ) : ?>
 			<details class="info-col" open>
-				<summary class="info-col__title">Материалы и уход</summary>
+				<summary class="info-col__title"><?php echo esc_html( carpediem_setting( 'product_materials_label' ) ); ?></summary>
 				<div class="info-col__body">
 					<?php if ( $material ) : ?>
-						<p>Состав: <span class="info-col__val"><?php echo esc_html( implode( ', ', $material ) ); ?></span></p>
+						<p><?php echo esc_html( carpediem_setting( 'product_material_label' ) ); ?>: <span class="info-col__val"><?php echo esc_html( implode( ', ', $material ) ); ?></span></p>
 					<?php endif; ?>
 					<?php if ( $density ) : ?>
-						<p>Плотность: <span class="info-col__val"><?php echo esc_html( implode( ', ', $density ) ); ?></span></p>
+						<p><?php echo esc_html( carpediem_setting( 'product_density_label' ) ); ?>: <span class="info-col__val"><?php echo esc_html( implode( ', ', $density ) ); ?></span></p>
 					<?php endif; ?>
 					<?php if ( $care ) : ?>
 						<ul class="care">
@@ -47,7 +47,7 @@ $density     = array_filter( (array) $density, fn( $v ) => '—' !== $v );
 
 		<?php if ( $sizes ) : ?>
 			<details class="info-col" id="product-sizes" open>
-				<summary class="info-col__title">Таблица размеров</summary>
+				<summary class="info-col__title"><?php echo esc_html( carpediem_setting( 'product_sizes_label' ) ); ?></summary>
 				<div class="info-col__body">
 					<div class="size-table__scroll" role="region" aria-label="Таблица размеров" tabindex="0">
 						<table class="size-table">
@@ -61,7 +61,7 @@ $density     = array_filter( (array) $density, fn( $v ) => '—' !== $v );
 							</tbody>
 						</table>
 					</div>
-					<p class="size-table__note">Все измерения указаны в сантиметрах.</p>
+					<p class="size-table__note"><?php echo esc_html( carpediem_setting( 'product_size_note' ) ); ?></p>
 				</div>
 			</details>
 		<?php endif; ?>

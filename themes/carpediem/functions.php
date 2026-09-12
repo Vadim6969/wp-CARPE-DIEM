@@ -37,7 +37,14 @@ add_action( 'wp_enqueue_scripts', function () {
 	// Версия по времени правки файла: не думаем о кэше ни в разработке, ни при деплое.
 	wp_enqueue_style( 'carpediem', get_theme_file_uri( 'assets/css/main.css' ), array( 'carpediem-fonts' ), carpediem_asset_version( 'assets/css/main.css' ) );
 	wp_enqueue_script( 'carpediem', get_theme_file_uri( 'assets/js/main.js' ), array( 'jquery' ), carpediem_asset_version( 'assets/js/main.js' ), true );
-	wp_localize_script( 'carpediem', 'carpediemUI', array( 'colors' => carpediem_color_swatches() ) );
+	wp_localize_script( 'carpediem', 'carpediemUI', array(
+		'colors' => carpediem_color_swatches(),
+		'catalogFiltersLabel' => carpediem_setting( 'catalog_filters_label' ),
+		'quickOrderSuccessTitle' => carpediem_setting( 'quick_order_success_title' ),
+		'quickOrderCloseLabel' => carpediem_setting( 'quick_order_close_label' ),
+		'quickOrderGenericError' => carpediem_setting( 'quick_order_generic_error' ),
+		'quickOrderNetworkError' => carpediem_setting( 'quick_order_network_error' ),
+	) );
 	if ( function_exists( 'WC' ) ) {
 		wp_enqueue_script( 'wc-cart-fragments' );
 	}

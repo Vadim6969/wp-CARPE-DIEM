@@ -2,9 +2,11 @@
 /** Главная: бренд, подборка вещей, категории и история. */
 defined( 'ABSPATH' ) || exit;
 get_header();
+$hero_image = carpediem_setting( 'hero_image' );
+$brand_image = carpediem_setting( 'brand_image' );
 ?>
 <section class="hero hero--editorial">
-	<div class="container hero__layout">
+	<div class="container hero__layout<?php echo $hero_image ? '' : ' hero__layout--text-only'; ?>">
 		<div class="hero__copy">
 			<p class="eyebrow"><span class="eyebrow__cross" aria-hidden="true">✟</span> <?php echo esc_html( carpediem_setting( 'collection' ) ); ?></p>
 			<h1 class="hero__headline"><?php echo esc_html( carpediem_setting( 'hero_title' ) ); ?></h1>
@@ -15,16 +17,16 @@ get_header();
 			</div>
 			<div class="hero__signature"><span>CARPE DIEM</span><span>Style of Soul</span></div>
 		</div>
-		<div class="hero__art <?php echo carpediem_setting( 'hero_image' ) ? 'hero__art--photo' : ''; ?>">
-			<?php if ( carpediem_setting( 'hero_image' ) ) : ?>
-				<?php echo wp_get_attachment_image( carpediem_setting( 'hero_image' ), 'large', false, array( 'class' => 'hero__image', 'fetchpriority' => 'high', 'loading' => 'eager', 'sizes' => '(max-width: 899px) 100vw, 50vw' ) ); ?>
-			<?php else : ?>
-				<div class="hero__orbit" aria-hidden="true"></div>
-				<?php get_template_part( 'template-parts/monogram', null, array( 'class' => 'hero__emblem' ) ); ?>
-			<?php endif; ?>
-			<span class="hero__art-label">CARPE DIEM / <?php echo esc_html( carpediem_setting( 'collection' ) ); ?></span>
-			<span class="hero__art-cross" aria-hidden="true">✟</span>
-		</div>
+		<?php if ( ! $hero_image ) : ?>
+			<div class="hero__ghost" aria-hidden="true"><span>CARPE</span><span>DIEM</span></div>
+		<?php endif; ?>
+		<?php if ( $hero_image ) : ?>
+			<div class="hero__art hero__art--photo">
+				<?php echo wp_get_attachment_image( $hero_image, 'large', false, array( 'class' => 'hero__image', 'fetchpriority' => 'high', 'loading' => 'eager', 'sizes' => '(max-width: 899px) 100vw, 50vw' ) ); ?>
+				<span class="hero__art-label">CARPE DIEM / <?php echo esc_html( carpediem_setting( 'collection' ) ); ?></span>
+				<span class="hero__art-cross" aria-hidden="true">✟</span>
+			</div>
+		<?php endif; ?>
 	</div>
 </section>
 
@@ -68,8 +70,8 @@ get_header();
 </div></div>
 
 <section class="section brand">
-	<div class="container"><div class="brand__inner">
-		<div class="brand__media"><?php if ( carpediem_setting( 'brand_image' ) ) { echo wp_get_attachment_image( carpediem_setting( 'brand_image' ), 'large', false, array( 'class' => 'brand__image', 'loading' => 'lazy' ) ); } else { get_template_part( 'template-parts/monogram', null, array( 'class' => 'brand__mark' ) ); } ?></div>
+	<div class="container"><div class="brand__inner<?php echo $brand_image ? '' : ' brand__inner--text-only'; ?>">
+		<?php if ( $brand_image ) : ?><div class="brand__media"><?php echo wp_get_attachment_image( $brand_image, 'large', false, array( 'class' => 'brand__image', 'loading' => 'lazy' ) ); ?></div><?php endif; ?>
 		<div class="brand__body"><p class="eyebrow">Больше, чем одежда</p><h2 class="brand__title"><?php echo esc_html( carpediem_setting( 'brand_title' ) ); ?></h2><p class="brand__text"><?php echo nl2br( esc_html( carpediem_setting( 'brand_text' ) ) ); ?></p><a class="text-link" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">История бренда ↗</a></div>
 	</div></div>
 </section>

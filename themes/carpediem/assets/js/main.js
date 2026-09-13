@@ -117,7 +117,8 @@
 
 			if ( isColor ) {
 				btn.title = option.textContent;
-				btn.innerHTML = '<span class="swatch__dot"></span><span class="screen-reader-text"></span>';
+				btn.setAttribute( 'aria-label', option.textContent );
+				btn.innerHTML = '<span class="swatch__dot"></span><span class="swatch__label"></span>';
 				btn.lastChild.textContent = option.textContent;
 				btn.firstChild.style.background = colors[ option.value ] || '#888888';
 			} else {

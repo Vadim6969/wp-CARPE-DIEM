@@ -187,6 +187,23 @@ add_filter( 'nav_menu_link_attributes', function ( $attrs, $item, $args ) {
 	return $attrs;
 }, 10, 3 );
 
+// Переводим только исходные английские подписи; любое своё название из «Меню» остаётся без изменений.
+add_filter( 'nav_menu_item_title', function ( $title, $item, $args ) {
+	if ( 'primary' !== ( $args->theme_location ?? '' ) ) {
+		return $title;
+	}
+
+	$labels = array(
+		'collections' => 'Коллекции',
+		'catalog'     => 'Каталог',
+		'about'       => 'О бренде',
+		'lookbook'    => 'Лукбук',
+	);
+	$key = strtolower( trim( wp_strip_all_tags( $title ) ) );
+
+	return $labels[ $key ] ?? $title;
+}, 10, 3 );
+
 /* ---------- Страница товара ---------- */
 
 // Якорь для кнопки «Купить» из каталога — сразу к выбору параметров и действиям.

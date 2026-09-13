@@ -119,7 +119,8 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	$screen = get_current_screen();
 	$store = 'toplevel_page_carpediem' === $hook;
 	$taxonomy = $screen && in_array( $screen->taxonomy, array( 'product_cat', 'pa_color' ), true );
-	if ( ! $store && ! $taxonomy ) { return; }
+	$product_editor = $screen && 'product' === $screen->post_type && 'post' === $screen->base;
+	if ( ! $store && ! $taxonomy && ! $product_editor ) { return; }
 	wp_enqueue_style( 'carpediem-admin', get_theme_file_uri( 'assets/css/admin.css' ), array(), carpediem_asset_version( 'assets/css/admin.css' ) );
 	wp_enqueue_script( 'carpediem-admin', get_theme_file_uri( 'assets/js/admin.js' ), array( 'jquery' ), carpediem_asset_version( 'assets/js/admin.js' ), true );
 	if ( $store ) {
@@ -128,6 +129,67 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 		wp_enqueue_style( 'woocommerce_admin_styles' );
 	}
 }, 30 );
+
+/**
+ * Понятный маршрут поверх штатного редактора WooCommerce.
+ * Ничего не сохраняет самостоятельно и не заменяет поля Woo — только ведёт к ним.
+ */
+function carpediem_product_editor_guide( $post ) {
+	if ( ! $post instanceof WP_Post || 'product' !== $post->post_type || ! current_user_can( 'edit_post', $post->ID ) ) {
+		return;
+	}
+
+	$is_new = 'auto-draft' === $post->post_status;
+	$product = wc_get_product( $post->ID );
+	$has_saved_price = ! $is_new && $product && '' !== $product->get_price();
+	$steps = array(
+		array( 'name', 'Название', 'Коротко и понятно: тип вещи и название модели.', 'К названию' ),
+		array( 'photo', 'Главное фото', 'Вертикальное фото 3:4 лучше всего выглядит в каталоге.', 'Добавить фото' ),
+		array( 'category', 'Категория', 'Выберите одну основную категорию: худи, футболки, сумки и т. д.', 'Выбрать категорию' ),
+		array( 'purchase', 'Цена и варианты', 'Для вещи с размерами или цветами понадобятся атрибуты и вариации.', 'Настроить продажу' ),
+	);
+	?>
+	<section class="cd-product-guide" data-cd-product-guide data-is-new="<?php echo $is_new ? 'true' : 'false'; ?>" data-purchase-ready="<?php echo $has_saved_price ? 'true' : 'false'; ?>" aria-labelledby="cd-product-guide-title">
+		<header class="cd-product-guide__header">
+			<div>
+				<span class="cd-product-guide__eyebrow">CARPE DIEM / ПОМОЩНИК ТОВАРА</span>
+				<h2 id="cd-product-guide-title">Добавьте товар по шагам</h2>
+				<p>Заполняйте обычные поля WooCommerce — помощник только показывает порядок и ничего не меняет без вашего действия.</p>
+			</div>
+			<div class="cd-product-progress" aria-live="polite">
+				<strong><span data-cd-product-done>0</span> из <?php echo count( $steps ); ?></strong>
+				<span>обязательных шагов</span>
+				<i><b data-cd-product-progress></b></i>
+			</div>
+		</header>
+
+		<?php if ( $is_new ) : ?>
+			<div class="cd-product-type-choice" role="group" aria-label="Тип товара">
+				<div><strong>Сначала выберите тип</strong><span>Его всегда можно изменить в блоке «Данные товара» до публикации.</span></div>
+				<button type="button" class="button" data-cd-product-type="simple"><span aria-hidden="true">1</span> Без размеров и цветов</button>
+				<button type="button" class="button" data-cd-product-type="variable"><span aria-hidden="true">S–XL</span> Есть размеры или цвета</button>
+			</div>
+		<?php endif; ?>
+
+		<ol class="cd-product-steps">
+			<?php foreach ( $steps as $index => $step ) : ?>
+				<li class="cd-product-step" data-cd-product-check="<?php echo esc_attr( $step[0] ); ?>">
+					<span class="cd-product-step__number"><?php echo esc_html( $index + 1 ); ?></span>
+					<div><strong><?php echo esc_html( $step[1] ); ?></strong><p data-cd-product-step-copy="<?php echo esc_attr( $step[0] ); ?>"><?php echo esc_html( $step[2] ); ?></p></div>
+					<span class="cd-product-step__status" data-cd-product-status>Нужно заполнить</span>
+					<button type="button" class="button cd-product-step__action" data-cd-product-section="<?php echo esc_attr( $step[0] ); ?>"><?php echo esc_html( $step[3] ); ?> →</button>
+				</li>
+			<?php endforeach; ?>
+		</ol>
+
+		<footer class="cd-product-guide__footer">
+			<p><strong>По желанию:</strong> добавьте подробное описание, галерею, остатки и метку «Новинка».</p>
+			<button type="button" class="button button-primary" data-cd-product-section="publish">Проверить и опубликовать →</button>
+		</footer>
+	</section>
+	<?php
+}
+add_action( 'edit_form_after_title', 'carpediem_product_editor_guide' );
 
 function carpediem_admin_field( $key, $field ) {
 	$value = carpediem_setting( $key );
@@ -228,14 +290,14 @@ function carpediem_admin_overview() {
 		<?php endforeach; if ( ! $orders ) : ?><tr><td colspan="5">Заказов пока нет. Здесь появятся первые покупки и заявки.</td></tr><?php endif; ?>
 		</tbody></table></div><a href="<?php echo esc_url( $orders_url ); ?>">Все заказы →</a>
 	</section><section class="cd-panel cd-panel--stack"><h2>Быстрые действия</h2><div class="cd-shortcuts">
-		<?php foreach ( array( 'Добавить товар' => 'post-new.php?post_type=product', 'Товары и цены' => 'edit.php?post_type=product', 'Остатки и наличие' => 'admin.php?page=wc-reports&tab=stock', 'Категории и обложки' => 'edit-tags.php?taxonomy=product_cat&post_type=product', 'Промокоды' => 'edit.php?post_type=shop_coupon', 'Доставка' => 'admin.php?page=wc-settings&tab=shipping', 'Способы оплаты' => 'admin.php?page=wc-settings&tab=checkout' ) as $label => $url ) : ?><a href="<?php echo esc_url( admin_url( $url ) ); ?>"><?php echo esc_html( $label ); ?><span>↗</span></a><?php endforeach; ?>
+		<?php foreach ( array( 'Добавить товар по шагам' => 'post-new.php?post_type=product', 'Товары и цены' => 'edit.php?post_type=product', 'Остатки и наличие' => 'admin.php?page=wc-reports&tab=stock', 'Категории и обложки' => 'edit-tags.php?taxonomy=product_cat&post_type=product', 'Промокоды' => 'edit.php?post_type=shop_coupon', 'Доставка' => 'admin.php?page=wc-settings&tab=shipping', 'Способы оплаты' => 'admin.php?page=wc-settings&tab=checkout' ) as $label => $url ) : ?><a href="<?php echo esc_url( admin_url( $url ) ); ?>"><?php echo esc_html( $label ); ?><span>↗</span></a><?php endforeach; ?>
 	</div></section></div>
 	<?php
 }
 
 function carpediem_admin_guide() {
 	$items = array(
-		array( '01', 'Фотографии и описание', 'В карточке товара добавь основное изображение, галерею и описание. Вертикальные фотографии 3:4 смотрятся в каталоге лучше всего. Короткое описание выводится под галереей.', 'edit.php?post_type=product', 'Открыть товары' ),
+		array( '01', 'Фотографии и описание', 'В карточке товара добавь основное изображение, галерею и описание. Вертикальные фотографии 3:4 смотрятся в каталоге лучше всего. Короткое описание выводится под галереей.', 'post-new.php?post_type=product', 'Добавить товар' ),
 		array( '02', 'Размеры, цвета и остатки', 'В «Данные товара → Атрибуты» выбери размер и цвет, затем создай вариации. Для каждой вариации укажи цену и остаток. Состав, плотность, уход и особенности заполняются в тех же атрибутах.', 'edit.php?post_type=product&page=product_attributes', 'Открыть атрибуты' ),
 		array( '03', 'Размерные таблицы', 'Открой категорию и заполни таблицу мерок. Она появится на страницах товаров этой категории. Пустой столбец не выводится; пустая таблица скрывает блок.', 'edit-tags.php?taxonomy=product_cat&post_type=product', 'Настроить таблицы' ),
 		array( '04', 'Оттенки на витрине', 'В значениях атрибута «Цвет» укажи HEX-код. Для комбинированного цвета можно задать второй оттенок. Кнопки выбора обновятся на сайте после сохранения.', 'edit-tags.php?taxonomy=pa_color&post_type=product', 'Настроить цвета' ),

@@ -24,7 +24,7 @@
 			<?php wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false, 'fallback_cb' => false, 'depth' => 1 ) ); ?>
 			<div class="mobile-nav-actions">
 				<a href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>">Личный кабинет ↗</a>
-				<button class="js-theme-toggle" type="button" aria-label="Переключить тему">Светлая / тёмная тема</button>
+				<div class="mobile-nav-actions__theme"><span>Тема</span><?php carpediem_theme_toggle( 'theme-toggle--mobile' ); ?></div>
 			</div>
 		</nav>
 
@@ -36,10 +36,7 @@
 		</a>
 
 		<div class="site-header__actions">
-			<button class="theme-toggle js-theme-toggle" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема">
-				<span class="theme-toggle__sun"><?php echo carpediem_icon( 'sun' ); // phpcs:ignore ?></span>
-				<span class="theme-toggle__moon"><?php echo carpediem_icon( 'moon' ); // phpcs:ignore ?></span>
-			</button>
+			<?php carpediem_theme_toggle(); ?>
 
 			<details class="hsearch">
 				<summary aria-label="Поиск"><?php echo carpediem_icon( 'search' ); // phpcs:ignore ?><span>Поиск</span></summary>

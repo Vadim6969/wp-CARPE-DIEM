@@ -537,7 +537,20 @@
 
 	function apply( theme ) {
 		root.setAttribute( 'data-theme', theme );
-		buttons.forEach( function ( btn ) { btn.setAttribute( 'aria-pressed', String( theme === 'light' ) ); } );
+		buttons.forEach( function ( btn ) {
+			var darkLabel = btn.getAttribute( 'data-dark-label' ) || 'Демон';
+			var lightLabel = btn.getAttribute( 'data-light-label' ) || 'Ангел';
+			var currentLabel = theme === 'light' ? lightLabel : darkLabel;
+			var nextLabel = theme === 'light' ? darkLabel : lightLabel;
+			var status = btn.querySelector( '.js-theme-status' );
+
+			btn.setAttribute( 'aria-checked', String( theme === 'light' ) );
+			btn.setAttribute( 'aria-label', 'Включить тему «' + nextLabel + '»' );
+			btn.setAttribute( 'title', currentLabel + ' · переключить на «' + nextLabel + '»' );
+			if ( status ) {
+				status.textContent = 'Тема «' + currentLabel + '». Включить тему «' + nextLabel + '»';
+			}
+		} );
 		try {
 			localStorage.setItem( 'cd-theme', theme );
 		} catch ( e ) {}
@@ -546,7 +559,11 @@
 	apply( root.getAttribute( 'data-theme' ) === 'light' ? 'light' : 'dark' );
 
 	buttons.forEach( function ( btn ) {
-		btn.addEventListener( 'click', function () { apply( root.getAttribute( 'data-theme' ) === 'light' ? 'dark' : 'light' ); } );
+		btn.addEventListener( 'click', function () {
+			root.classList.add( 'theme-changing' );
+			apply( root.getAttribute( 'data-theme' ) === 'light' ? 'dark' : 'light' );
+			window.setTimeout( function () { root.classList.remove( 'theme-changing' ); }, 360 );
+		} );
 	} );
 } )();
 

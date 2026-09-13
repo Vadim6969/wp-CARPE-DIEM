@@ -10,6 +10,10 @@ function carpediem_admin_sections() {
 			'hero_button' => array( 'Текст кнопки', 'text' ), 'hero_url' => array( 'Ссылка кнопки', 'url' ),
 			'hero_image' => array( 'Фотография коллекции', 'image' ),
 		) ),
+		'appearance' => array( 'Демон / Ангел', 'Подписи переключателя тем. Тёмная тема остаётся основной.', array(
+			'theme_dark_label' => array( 'Название тёмной темы', 'text' ),
+			'theme_light_label' => array( 'Название светлой темы', 'text' ),
+		) ),
 		'selection' => array( 'Товары и категории', 'Собери подборку для главной и расставь категории в нужном порядке.', array(
 			'selection_title' => array( 'Заголовок подборки', 'text' ), 'product_ids' => array( 'Товары на главной', 'products' ),
 			'category_ids' => array( 'Категории на главной', 'categories' ),

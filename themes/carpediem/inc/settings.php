@@ -11,6 +11,8 @@ function carpediem_setting_defaults() {
 		'hero_button' => 'Смотреть коллекцию',
 		'hero_url' => home_url( '/catalog/' ),
 		'hero_image' => 0,
+		'theme_dark_label' => 'Демон',
+		'theme_light_label' => 'Ангел',
 		'selection_title' => 'Выбор CARPE DIEM',
 		'product_ids' => array(),
 		'category_ids' => null,

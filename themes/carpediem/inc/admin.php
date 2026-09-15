@@ -48,14 +48,6 @@ function carpediem_admin_sections() {
 			'product_density_label' => array( 'Плотность', 'text' ), 'product_sizes_label' => array( 'Таблица размеров', 'text' ),
 			'product_size_note' => array( 'Примечание под размерами', 'text' ),
 		) ),
-		'quick_order_copy' => array( 'Заказ по телефону', 'Тексты короткой заявки для покупателя, которому удобнее звонок.', array(
-			'quick_order_button_label' => array( 'Кнопка на товаре', 'text' ), 'quick_order_title' => array( 'Заголовок окна', 'text' ),
-			'quick_order_text' => array( 'Пояснение', 'textarea' ), 'quick_order_name_label' => array( 'Поле имени', 'text' ),
-			'quick_order_phone_label' => array( 'Поле телефона', 'text' ), 'quick_order_consent_label' => array( 'Согласие на обработку данных', 'text' ),
-			'quick_order_submit_label' => array( 'Отправить заявку', 'text' ), 'quick_order_cancel_label' => array( 'Отмена', 'text' ),
-			'quick_order_success_title' => array( 'Заявка отправлена', 'text' ), 'quick_order_close_label' => array( 'Закрыть окно', 'text' ),
-			'quick_order_generic_error' => array( 'Ошибка отправки', 'text' ), 'quick_order_network_error' => array( 'Ошибка сети', 'text' ),
-		) ),
 		'checkout_copy' => array( 'Оформление заказа', 'Короткие и однозначные формулировки для страницы оформления.', array(
 			'checkout_intro_eyebrow' => array( 'Подпись вводного блока', 'text' ), 'checkout_intro_title' => array( 'Заголовок вводного блока', 'text' ),
 			'checkout_intro_text' => array( 'Пояснение', 'textarea' ), 'checkout_contact_heading' => array( 'Заголовок контактов', 'text' ),
@@ -254,7 +246,7 @@ function carpediem_admin_page() {
 	$tabs = array( 'overview' => 'Обзор магазина', 'storefront' => 'Оформление сайта', 'copy' => 'Тексты магазина', 'contacts' => 'Контакты и условия', 'guide' => 'Работа с товарами' );
 	$section_tabs = array(
 		'hero' => 'storefront', 'selection' => 'storefront', 'brand' => 'storefront', 'contacts' => 'contacts',
-		'catalog_copy' => 'copy', 'product_copy' => 'copy', 'quick_order_copy' => 'copy', 'checkout_copy' => 'copy', 'cart_copy' => 'copy',
+		'catalog_copy' => 'copy', 'product_copy' => 'copy', 'checkout_copy' => 'copy', 'cart_copy' => 'copy',
 	);
 	$tab = isset( $_GET['tab'] ) && is_string( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'overview';
 	if ( ! isset( $tabs[ $tab ] ) ) { $tab = 'overview'; }

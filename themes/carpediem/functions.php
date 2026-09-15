@@ -39,10 +39,6 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'carpediem', get_theme_file_uri( 'assets/js/main.js' ), array( 'jquery' ), carpediem_asset_version( 'assets/js/main.js' ), true );
 	wp_localize_script( 'carpediem', 'carpediemUI', array(
 		'colors' => carpediem_color_swatches(),
-		'quickOrderSuccessTitle' => carpediem_setting( 'quick_order_success_title' ),
-		'quickOrderCloseLabel' => carpediem_setting( 'quick_order_close_label' ),
-		'quickOrderGenericError' => carpediem_setting( 'quick_order_generic_error' ),
-		'quickOrderNetworkError' => carpediem_setting( 'quick_order_network_error' ),
 	) );
 	if ( function_exists( 'WC' ) ) {
 		wp_enqueue_script( 'wc-cart-fragments' );
@@ -51,6 +47,16 @@ add_action( 'wp_enqueue_scripts', function () {
 
 add_action( 'wp_head', function () {
 	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+	if ( ! has_site_icon() ) {
+		$favicon_url = add_query_arg(
+			'ver',
+			carpediem_asset_version( 'assets/img/favicon.png' ),
+			get_theme_file_uri( 'assets/img/favicon.png' )
+		);
+		printf( '<link rel="icon" type="image/png" sizes="512x512" href="%1$s">' . "\n", esc_url( $favicon_url ) );
+		printf( '<link rel="shortcut icon" type="image/png" href="%1$s">' . "\n", esc_url( $favicon_url ) );
+		printf( '<link rel="apple-touch-icon" sizes="512x512" href="%1$s">' . "\n", esc_url( $favicon_url ) );
+	}
 
 	// Тема применяется до первой отрисовки, иначе при светлой теме мелькнёт тёмный фон.
 	echo '<script>(function(){try{var t=localStorage.getItem("cd-theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();</script>' . "\n";
@@ -76,7 +82,6 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 require get_theme_file_path( 'inc/settings.php' );
 require get_theme_file_path( 'inc/admin.php' );
 require get_theme_file_path( 'inc/woo.php' );
-require get_theme_file_path( 'inc/one-click.php' );
 require get_theme_file_path( 'inc/favorites.php' );
 require get_theme_file_path( 'inc/seo.php' );
 

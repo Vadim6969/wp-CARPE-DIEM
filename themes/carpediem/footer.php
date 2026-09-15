@@ -26,7 +26,7 @@ $social_labels  = array(
 				<?php if ( has_custom_logo() ) : ?>
 					<?php echo get_custom_logo(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php else : ?>
-					<span class="site-footer__logo-placeholder" aria-hidden="true">&#10015;</span>
+					<img class="custom-logo" src="<?php echo esc_url( get_theme_file_uri( 'assets/img/brand-logo-metallic.png' ) ); ?>" width="1024" height="1024" loading="lazy" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
 				<?php endif; ?>
 			</div>
 			<span class="site-footer__name"><?php bloginfo( 'name' ); ?></span>

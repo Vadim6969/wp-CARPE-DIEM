@@ -32,9 +32,16 @@ function carpediem_is_catalog_archive() {
 	return is_shop() || is_product_taxonomy();
 }
 
+/** Каталог и блоки рекомендаций используют карточку только с фото, названием и ценой. */
+function carpediem_is_minimal_product_loop() {
+	return carpediem_is_catalog_archive() || ! empty( $GLOBALS['carpediem_minimal_product_loop'] );
+}
+
 // Каталог: 12 товаров, три колонки; другие подборки сохраняют четыре.
 add_filter( 'loop_shop_per_page', fn() => 12, 20 );
 add_filter( 'loop_shop_columns', fn() => carpediem_is_catalog_archive() ? 3 : 4, 20 );
+add_filter( 'woocommerce_cross_sells_total', fn() => 5 );
+add_filter( 'woocommerce_cross_sells_columns', fn() => 5 );
 remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
 remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
 remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
@@ -86,7 +93,7 @@ remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_ad
 
 // Над названием — категория, как на макете.
 add_action( 'woocommerce_shop_loop_item_title', function () {
-	if ( carpediem_is_catalog_archive() ) {
+	if ( carpediem_is_minimal_product_loop() ) {
 		return;
 	}
 
@@ -99,7 +106,7 @@ add_action( 'woocommerce_shop_loop_item_title', function () {
 
 // Бейдж «Новинка» на карточке и на странице товара.
 function carpediem_new_badge() {
-	if ( carpediem_is_catalog_archive() ) {
+	if ( carpediem_is_minimal_product_loop() ) {
 		return;
 	}
 
@@ -112,7 +119,7 @@ add_action( 'woocommerce_before_shop_loop_item_title', 'carpediem_new_badge', 15
 
 // После закрывающей ссылки: кнопка избранного не вложена в ссылку товара.
 add_action( 'woocommerce_after_shop_loop_item', function () {
-	if ( carpediem_is_catalog_archive() ) {
+	if ( carpediem_is_minimal_product_loop() ) {
 		return;
 	}
 
@@ -133,7 +140,7 @@ add_action( 'woocommerce_after_shop_loop_item', function () {
  * Простой товар добавляется сразу, для вариативного сначала открывается выбор размера/цвета.
  */
 function carpediem_loop_purchase_button() {
-	if ( carpediem_is_catalog_archive() ) {
+	if ( carpediem_is_minimal_product_loop() ) {
 		return;
 	}
 
@@ -237,10 +244,38 @@ add_filter( 'nav_menu_item_title', function ( $title, $item, $args ) {
 
 /* ---------- Страница товара ---------- */
 
+/** Логотип магазина для атмосферных плашек товара и корзины. */
+function carpediem_commerce_brand() {
+	$logo_id = absint( get_theme_mod( 'custom_logo' ) );
+	?>
+	<div class="commerce-brand">
+		<?php if ( $logo_id ) : ?>
+			<?php echo wp_get_attachment_image( $logo_id, 'medium', false, array( 'class' => 'commerce-brand__logo', 'alt' => get_bloginfo( 'name' ) ) ); ?>
+		<?php else : ?>
+			<img class="commerce-brand__logo" src="<?php echo esc_url( get_theme_file_uri( 'assets/img/brand-logo-metallic.png' ) ); ?>" width="1024" height="1024" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+function carpediem_product_brand_hero() {
+	echo '<header class="commerce-page-hero commerce-page-hero--product">';
+	carpediem_commerce_brand();
+	echo '</header>';
+}
+add_action( 'woocommerce_before_single_product', 'carpediem_product_brand_hero', 5 );
+
 // Якорь для кнопки «Купить» из каталога — сразу к выбору параметров и действиям.
 add_action( 'woocommerce_before_add_to_cart_form', function () {
 	echo '<span id="product-buy" class="product-buy-anchor" aria-hidden="true"></span>';
 }, 5 );
+
+add_action( 'woocommerce_before_add_to_cart_button', function () {
+	global $product;
+	if ( $product && $product->is_type( 'variable' ) ) {
+		echo '<p class="product-selection-note js-product-selection-note" aria-live="polite">Выберите размер и цвет — кнопки покупки станут активными.</p>';
+	}
+}, 1 );
 
 /**
  * «Купить сейчас» оформляет выбранный вариант без промежуточного визита в корзину.
@@ -361,7 +396,7 @@ function carpediem_cross_sells() {
 		'post_type'      => 'product',
 		'post__in'       => $ids,
 		'orderby'        => 'post__in',
-		'posts_per_page' => 8,
+		'posts_per_page' => 5,
 		'no_found_rows'  => true,
 	) );
 
@@ -369,16 +404,18 @@ function carpediem_cross_sells() {
 		return;
 	}
 	?>
-	<section class="section cross-sells">
+	<section class="section cross-sells carpediem-minimal-products">
 		<div class="container">
 			<h2 class="section-title"><?php echo esc_html( carpediem_setting( 'product_related_label' ) ); ?></h2>
 			<div class="products-scroller">
 				<ul class="products columns-5">
 					<?php
+					$GLOBALS['carpediem_minimal_product_loop'] = true;
 					while ( $query->have_posts() ) {
 						$query->the_post();
 						wc_get_template_part( 'content', 'product' );
 					}
+					unset( $GLOBALS['carpediem_minimal_product_loop'] );
 					wp_reset_postdata();
 					?>
 				</ul>
@@ -511,6 +548,54 @@ add_action( 'woocommerce_admin_order_data_after_billing_address', function ( $or
 			esc_html( $order->get_meta( '_carpediem_consent_ip' ) )
 		);
 	}
+} );
+
+/* ---------- Вход и регистрация ---------- */
+
+/** Какая форма аккаунта должна быть показана на гостевой странице. */
+function carpediem_account_auth_mode() {
+	if ( ! is_account_page() || is_user_logged_in() || is_wc_endpoint_url() ) {
+		return '';
+	}
+	if ( 'yes' !== get_option( 'woocommerce_enable_myaccount_registration' ) ) {
+		return 'login';
+	}
+
+	if ( isset( $_POST['register'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- режим отображения, данные обрабатывает WooCommerce.
+		return 'register';
+	}
+	if ( isset( $_POST['login'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- режим отображения, данные обрабатывает WooCommerce.
+		return 'login';
+	}
+
+	$requested = isset( $_GET['auth'] ) ? sanitize_key( wp_unslash( $_GET['auth'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- параметр меняет только видимую форму.
+	return 'register' === $requested ? 'register' : 'login';
+}
+
+add_filter( 'body_class', function ( $classes ) {
+	$mode = carpediem_account_auth_mode();
+	if ( $mode ) {
+		$classes[] = 'account-auth-' . $mode;
+	}
+	return $classes;
+} );
+
+/** Переключатель оставляет на экране только одну форму: вход или регистрацию. */
+add_action( 'woocommerce_before_customer_login_form', function () {
+	if ( 'yes' !== get_option( 'woocommerce_enable_myaccount_registration' ) ) {
+		return;
+	}
+
+	$mode         = carpediem_account_auth_mode();
+	$account_url  = wc_get_page_permalink( 'myaccount' );
+	$login_url    = $account_url . '#customer_login';
+	$register_url = add_query_arg( 'auth', 'register', $account_url ) . '#customer_login';
+	?>
+	<nav class="account-auth-switcher js-account-auth-switcher" aria-label="Вход или регистрация">
+		<a class="account-auth-switcher__link" data-auth-mode="login" href="<?php echo esc_url( $login_url ); ?>"<?php echo 'login' === $mode ? ' aria-current="page"' : ''; ?>>Вход</a>
+		<a class="account-auth-switcher__link" data-auth-mode="register" href="<?php echo esc_url( $register_url ); ?>"<?php echo 'register' === $mode ? ' aria-current="page"' : ''; ?>>Регистрация</a>
+	</nav>
+	<?php
 } );
 
 /* ---------- Уход и размеры ---------- */

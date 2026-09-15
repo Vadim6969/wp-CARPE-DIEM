@@ -30,10 +30,11 @@ add_shortcode( 'carpediem_favorites', function () {
 	ob_start();
 	?>
 	<div class="woocommerce favorites js-favorites" data-ajax="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
-		<p class="favorites__empty js-favorites-empty">
-			Здесь пока пусто. Нажмите «В избранное» на странице вещи — список сохранится в этом браузере.
-			<a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">Перейти в каталог</a>
-		</p>
+		<div class="favorites__empty js-favorites-empty">
+			<p class="favorites__empty-title"><strong>Здесь пока пусто.</strong></p>
+			<p>Добавьте в избранное то, что вам понравилось.</p>
+			<a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>">Перейти в каталог →</a>
+		</div>
 		<div class="js-favorites-list"></div>
 	</div>
 	<?php

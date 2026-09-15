@@ -3,7 +3,8 @@
 defined( 'ABSPATH' ) || exit;
 get_header();
 $hero_image = carpediem_setting( 'hero_image' );
-$brand_image = carpediem_setting( 'brand_image' );
+$brand_image = absint( carpediem_setting( 'brand_image' ) );
+$brand_monogram_url = get_theme_file_uri( 'assets/img/brand-monogram-line.png' );
 $lookbook_images = array();
 for ( $lookbook_index = 1; $lookbook_index <= 4; $lookbook_index++ ) {
 	$lookbook_images[] = absint( carpediem_setting( 'lookbook_image_' . $lookbook_index ) );
@@ -12,7 +13,7 @@ for ( $lookbook_index = 1; $lookbook_index <= 4; $lookbook_index++ ) {
 <section class="hero hero--editorial">
 	<div class="container hero__layout<?php echo $hero_image ? '' : ' hero__layout--text-only'; ?>">
 		<div class="hero__copy">
-			<p class="eyebrow"><span class="eyebrow__cross" aria-hidden="true">✟</span> <?php echo esc_html( carpediem_setting( 'collection' ) ); ?></p>
+			<p class="eyebrow"><span class="eyebrow__cross brand-cross brand-cross--classic" aria-hidden="true"></span><?php echo esc_html( carpediem_setting( 'collection' ) ); ?></p>
 			<h1 class="hero__headline"><?php echo esc_html( carpediem_setting( 'hero_title' ) ); ?></h1>
 			<p class="hero__description"><?php echo esc_html( carpediem_setting( 'hero_text' ) ); ?></p>
 			<div class="hero__actions">
@@ -22,7 +23,9 @@ for ( $lookbook_index = 1; $lookbook_index <= 4; $lookbook_index++ ) {
 			<div class="hero__signature"><span>CARPE DIEM</span><span>Style of Soul</span></div>
 		</div>
 		<?php if ( ! $hero_image ) : ?>
-			<div class="hero__ghost" aria-hidden="true"><span>CARPE</span><span>DIEM</span></div>
+			<div class="hero__sigil" aria-hidden="true">
+				<img class="hero__sigil-mark" src="<?php echo esc_url( $brand_monogram_url ); ?>" width="1024" height="1024" alt="">
+			</div>
 		<?php endif; ?>
 		<?php if ( $hero_image ) : ?>
 			<div class="hero__art hero__art--photo">
@@ -99,15 +102,21 @@ for ( $lookbook_index = 1; $lookbook_index <= 4; $lookbook_index++ ) {
 </section>
 
 <div class="marquee" aria-hidden="true"><div class="marquee__track">
-	<?php for ( $i = 0; $i < 2; $i++ ) : ?><span class="marquee__group"><?php for ( $j = 0; $j < 6; $j++ ) : ?><span>Carpe Diem</span><span class="marquee__cross">✟</span><span>Style of Soul</span><span class="marquee__cross">✟</span><?php endfor; ?></span><?php endfor; ?>
+	<?php for ( $i = 0; $i < 2; $i++ ) : ?><span class="marquee__group"><?php for ( $j = 0; $j < 6; $j++ ) : ?><span>Carpe Diem</span><span class="marquee__cross marquee__cross--classic"></span><span>Style of Soul</span><span class="marquee__cross marquee__cross--massive"></span><?php endfor; ?></span><?php endfor; ?>
 </div></div>
 
 <section class="section brand">
-	<div class="container"><div class="brand__inner<?php echo $brand_image ? '' : ' brand__inner--text-only'; ?>">
-		<?php if ( $brand_image ) : ?><div class="brand__media"><?php echo wp_get_attachment_image( $brand_image, 'large', false, array( 'class' => 'brand__image', 'loading' => 'lazy' ) ); ?></div><?php endif; ?>
+	<div class="container"><div class="brand__inner">
+		<div class="brand__media">
+			<?php if ( $brand_image ) : ?>
+				<?php echo wp_get_attachment_image( $brand_image, 'large', false, array( 'class' => 'brand__image', 'loading' => 'lazy' ) ); ?>
+			<?php else : ?>
+				<img class="brand__image brand__image--monogram" src="<?php echo esc_url( $brand_monogram_url ); ?>" width="1024" height="1024" loading="lazy" alt="Монограмма CARPE DIEM">
+			<?php endif; ?>
+		</div>
 		<div class="brand__body"><p class="eyebrow">Больше, чем одежда</p><h2 class="brand__title"><?php echo esc_html( carpediem_setting( 'brand_title' ) ); ?></h2><p class="brand__text"><?php echo nl2br( esc_html( carpediem_setting( 'brand_text' ) ) ); ?></p><a class="text-link" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">История бренда ↗</a></div>
 	</div></div>
 </section>
 
-<section class="community"><div class="container community__inner"><span class="community__symbol" aria-hidden="true">✟</span><h2 class="community__title"><?php echo esc_html( carpediem_setting( 'community_title' ) ); ?></h2><p class="community__text"><?php echo nl2br( esc_html( carpediem_setting( 'community_text' ) ) ); ?></p><?php if ( carpediem_setting( 'telegram' ) ) : ?><a class="btn" href="<?php echo esc_url( carpediem_setting( 'telegram' ) ); ?>" target="_blank" rel="noopener">Мы в Telegram ↗</a><?php else : ?><a class="text-link" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Ближе к бренду ↗</a><?php endif; ?></div></section>
+<section class="community"><div class="container community__inner"><span class="community__symbol brand-cross brand-cross--massive" aria-hidden="true"></span><h2 class="community__title"><?php echo esc_html( carpediem_setting( 'community_title' ) ); ?></h2><p class="community__text"><?php echo nl2br( esc_html( carpediem_setting( 'community_text' ) ) ); ?></p><?php if ( carpediem_setting( 'telegram' ) ) : ?><a class="btn" href="<?php echo esc_url( carpediem_setting( 'telegram' ) ); ?>" target="_blank" rel="noopener">Мы в Telegram ↗</a><?php else : ?><a class="text-link" href="<?php echo esc_url( home_url( '/about/' ) ); ?>">Ближе к бренду ↗</a><?php endif; ?></div></section>
 <?php get_footer(); ?>

@@ -51,20 +51,6 @@ function carpediem_setting_defaults() {
 		'product_sizes_label' => 'Таблица размеров',
 		'product_size_note' => 'Все измерения указаны в сантиметрах.',
 
-		// Короткая заявка по телефону.
-		'quick_order_button_label' => 'Заказать по телефону',
-		'quick_order_title' => 'Заказ по телефону',
-		'quick_order_text' => 'Оставьте имя и телефон — мы перезвоним и уточним детали.',
-		'quick_order_name_label' => 'Имя',
-		'quick_order_phone_label' => 'Телефон',
-		'quick_order_consent_label' => 'Согласен на обработку персональных данных',
-		'quick_order_submit_label' => 'Отправить заявку',
-		'quick_order_cancel_label' => 'Отмена',
-		'quick_order_success_title' => 'Готово',
-		'quick_order_close_label' => 'Закрыть',
-		'quick_order_generic_error' => 'Не получилось отправить. Попробуйте ещё раз.',
-		'quick_order_network_error' => 'Сеть недоступна. Попробуйте ещё раз.',
-
 		// Вариант B для короткого checkout: меньше текста, однозначное действие.
 		'checkout_intro_eyebrow' => 'Оформление заказа',
 		'checkout_intro_title' => 'Без регистрации',

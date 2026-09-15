@@ -17,9 +17,9 @@ if ( ! $header_brand || 'CARPE DIEM · Style of Soul' === $header_brand ) {
 }
 ?>
 <div class="announcement" role="region" aria-label="Название бренда">
-	<span class="announcement__cross" aria-hidden="true">&#10015;</span>
+	<span class="announcement__cross brand-cross brand-cross--classic" aria-hidden="true"></span>
 	<span class="announcement__name"><?php echo esc_html( $header_brand ); ?></span>
-	<span class="announcement__cross" aria-hidden="true">&#10015;</span>
+	<span class="announcement__cross brand-cross brand-cross--massive" aria-hidden="true"></span>
 </div>
 
 <header class="site-header js-header">

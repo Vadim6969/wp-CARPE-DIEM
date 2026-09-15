@@ -87,6 +87,11 @@ update_option( 'woocommerce_checkout_phone_field', 'required' );
 update_option( 'woocommerce_checkout_company_field', 'hidden' );
 update_option( 'woocommerce_ship_to_destination', 'billing_only' );
 
+/* --- Регистрация: покупатель задаёт пароль сам --- */
+update_option( 'woocommerce_enable_myaccount_registration', 'yes' );
+update_option( 'woocommerce_registration_generate_username', 'yes' );
+update_option( 'woocommerce_registration_generate_password', 'no' );
+
 $terms = get_page_by_path( 'oferta' );
 if ( ! $terms ) {
 	$terms_id = wp_insert_post( array(

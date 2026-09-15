@@ -44,6 +44,50 @@ check /privacy-policy/
 check /wp-sitemap.xml
 check /no-such-page/ 404
 
+# Страница доставки не должна возвращать прежние условия оплаты при получении.
+delivery_markup=$(curl -s -L "$BASE/delivery/")
+if ! printf '%s' "$delivery_markup" | grep -q 'СДЭК и Почтой России' || ! printf '%s' "$delivery_markup" | grep -q 'сервис «Долями»' || ! printf '%s' "$delivery_markup" | grep -q 'защищённую страницу оплаты'; then
+	echo "  ✗ на странице доставки нет актуальных условий доставки и оплаты"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "условия доставки и оплаты обновлены"
+fi
+
+# Инструкция по снятию мерок должна содержать новые пояснения и помощь с выбором размера.
+size_guide_markup=$(curl -s -L "$BASE/size-guide/")
+if ! printf '%s' "$size_guide_markup" | grep -q 'на ровной поверхности' || ! printf '%s' "$size_guide_markup" | grep -q 'полученное значение на 2' || ! printf '%s' "$size_guide_markup" | grep -q 'НЕ УВЕРЕНЫ В РАЗМЕРЕ?'; then
+	echo "  ✗ на странице таблицы размеров нет актуальной инструкции по меркам"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "инструкция по снятию мерок обновлена"
+fi
+
+# Страница бренда должна содержать актуальный манифест и его ключевые разделы.
+about_markup=$(curl -s -L "$BASE/about/")
+if ! printf '%s' "$about_markup" | grep -q 'не откладывает жизнь на потом' || ! printf '%s' "$about_markup" | grep -q 'НАША ФИЛОСОФИЯ' || ! printf '%s' "$about_markup" | grep -q 'МЫ ВСЕ ОДИНАКОВЫЕ В ОДНОМ'; then
+	echo "  ✗ на странице «О нас» нет актуального манифеста бренда"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "манифест бренда на странице «О нас» обновлён"
+fi
+
+# Пустое избранное и страница лукбука должны использовать актуальные тексты.
+favorites_markup=$(curl -s -L "$BASE/favorites/")
+if ! printf '%s' "$favorites_markup" | grep -q 'Добавьте в избранное то, что вам понравилось' || ! printf '%s' "$favorites_markup" | grep -q 'Перейти в каталог →'; then
+	echo "  ✗ на странице избранного нет актуального пустого состояния"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "пустое состояние избранного обновлено"
+fi
+
+lookbook_markup=$(curl -s -L "$BASE/lookbook/")
+if ! printf '%s' "$lookbook_markup" | grep -q 'как ты создаешь свой стиль' || ! printf '%s' "$lookbook_markup" | grep -q 'следующая фотография здесь — твоя' || ! printf '%s' "$lookbook_markup" | grep -q '@CARPEDIEM'; then
+	echo "  ✗ на странице LOOKBOOK нет актуального текста сообщества"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "текст страницы LOOKBOOK обновлён"
+fi
+
 # Каталог не должен опустеть: проверяем, что карточки на месте.
 count=$(curl -s -L "$BASE/catalog/" | grep -c 'woocommerce-loop-product__title')
 if [ "$count" -lt 1 ]; then
@@ -60,6 +104,64 @@ if printf '%s' "$catalog_markup" | grep -qE 'class="filters|woocommerce-ordering
 	FAILED=1
 else
 	printf '  ✓ %-46s\n' "каталог без фильтров и лишних действий"
+fi
+
+# Карточка товара объясняет выбор вариации, не предлагает заказ по телефону и упрощает рекомендации.
+product_markup=$(curl -s -L "$BASE/product/split-camo-thermochromic/")
+open_info_count=$(printf '%s' "$product_markup" | grep -oE '<details class="info-col"[^>]* open' | wc -l | tr -d ' ')
+if ! printf '%s' "$product_markup" | grep -q 'commerce-page-hero--product' || ! printf '%s' "$product_markup" | grep -q 'product-selection-note'; then
+	echo "  ✗ на карточке товара нет брендовой плашки или подсказки выбора"
+	FAILED=1
+elif [ "$open_info_count" -lt 3 ]; then
+	echo "  ✗ информационные блоки товара не открыты по умолчанию"
+	FAILED=1
+elif printf '%s' "$product_markup" | grep -qE 'one-click|quick_order'; then
+	echo "  ✗ на карточке товара остался заказ по телефону"
+	FAILED=1
+elif printf '%s' "$product_markup" | grep -qE 'loop-buy|loop-sizes|loop-favorite|loop-card__cat'; then
+	echo "  ✗ в рекомендациях товара остались лишние действия"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "карточка товара и рекомендации упрощены"
+fi
+
+# Заголовок корзины использует ту же брендовую атмосферную плашку.
+cart_markup=$(curl -s -L "$BASE/cart/")
+if ! printf '%s' "$cart_markup" | grep -q 'commerce-page-hero--cart'; then
+	echo "  ✗ в корзине нет брендовой плашки"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "брендовая плашка корзины на месте"
+fi
+
+# Полоса перед футером должна рассказывать о философии бренда, а не о сервисных преимуществах.
+philosophy_markup=$(curl -s -L "$BASE/")
+if ! printf '%s' "$philosophy_markup" | grep -q 'class="usp philosophy"' || ! printf '%s' "$philosophy_markup" | grep -q 'Наша философия'; then
+	echo "  ✗ перед подвалом нет блока философии бренда"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "философия бренда перед подвалом"
+fi
+
+# Главная использует новые монограмму, металлический логотип и кресты 01/08.
+branding_markup=$(curl -s -L "$BASE/")
+if ! printf '%s' "$branding_markup" | grep -q 'favicon.png' || ! printf '%s' "$branding_markup" | grep -q 'hero__sigil' || ! printf '%s' "$branding_markup" | grep -q 'brand-monogram-line.png' || ! printf '%s' "$branding_markup" | grep -q 'brand-logo-metallic.png' || ! printf '%s' "$branding_markup" | grep -q 'marquee__cross--classic' || ! printf '%s' "$branding_markup" | grep -q 'marquee__cross--massive'; then
+	echo "  ✗ новые брендовые знаки отображаются не полностью"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "монограмма, логотип и кресты 01/08 подключены"
+fi
+
+# На гостевой странице аккаунта доступны обе операции, но показывается только выбранная форма.
+account_markup=$(curl -s -L "$BASE/my-account/")
+if ! printf '%s' "$account_markup" | grep -q 'account-auth-switcher' || ! printf '%s' "$account_markup" | grep -q 'woocommerce-form-register'; then
+	echo "  ✗ в личном кабинете нет переключателя входа и регистрации"
+	FAILED=1
+elif ! printf '%s' "$account_markup" | grep -q 'id="reg_password"'; then
+	echo "  ✗ покупатель не может задать пароль при регистрации"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "вход, регистрация и свой пароль доступны"
 fi
 
 if [ "$FAILED" = "0" ]; then

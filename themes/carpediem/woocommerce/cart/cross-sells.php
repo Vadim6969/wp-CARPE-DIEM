@@ -9,11 +9,12 @@
 defined( 'ABSPATH' ) || exit;
 
 if ( $cross_sells ) : ?>
-	<section class="section cross-sells">
+	<section class="section cross-sells carpediem-minimal-products">
 		<h2 class="section-title">Рекомендуем</h2>
 
 		<div class="products-scroller">
 			<ul class="products columns-<?php echo esc_attr( $columns ); ?>">
+				<?php $GLOBALS['carpediem_minimal_product_loop'] = true; ?>
 				<?php foreach ( $cross_sells as $cross_sell ) : ?>
 					<?php
 					$post_object = get_post( $cross_sell->get_id() );
@@ -21,6 +22,7 @@ if ( $cross_sells ) : ?>
 					wc_get_template_part( 'content', 'product' );
 					?>
 				<?php endforeach; ?>
+				<?php unset( $GLOBALS['carpediem_minimal_product_loop'] ); ?>
 			</ul>
 		</div>
 	</section>

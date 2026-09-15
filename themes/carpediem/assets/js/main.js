@@ -58,6 +58,63 @@
 	}
 } )();
 
+/* В личном кабинете показываем только одну форму: вход или регистрацию. */
+( function () {
+	'use strict';
+
+	var switcher = document.querySelector( '.js-account-auth-switcher' );
+	var root = document.getElementById( 'customer_login' );
+	if ( ! switcher || ! root ) {
+		return;
+	}
+
+	var links = switcher.querySelectorAll( '[data-auth-mode]' );
+	var panels = {
+		login: root.querySelector( '.u-column1' ),
+		register: root.querySelector( '.u-column2' )
+	};
+
+	function show( mode, updateUrl, moveFocus ) {
+		mode = mode === 'register' ? 'register' : 'login';
+		document.body.classList.toggle( 'account-auth-login', mode === 'login' );
+		document.body.classList.toggle( 'account-auth-register', mode === 'register' );
+
+		Object.keys( panels ).forEach( function ( key ) {
+			if ( panels[ key ] ) {
+				panels[ key ].hidden = key !== mode;
+			}
+		} );
+
+		links.forEach( function ( link ) {
+			if ( link.dataset.authMode === mode ) {
+				link.setAttribute( 'aria-current', 'page' );
+			} else {
+				link.removeAttribute( 'aria-current' );
+			}
+		} );
+
+		var activeLink = switcher.querySelector( '[data-auth-mode="' + mode + '"]' );
+		if ( updateUrl && activeLink && window.history.replaceState ) {
+			window.history.replaceState( {}, '', activeLink.href );
+		}
+		if ( moveFocus && panels[ mode ] ) {
+			var field = panels[ mode ].querySelector( 'input:not([type="hidden"])' );
+			if ( field ) {
+				field.focus();
+			}
+		}
+	}
+
+	links.forEach( function ( link ) {
+		link.addEventListener( 'click', function ( event ) {
+			event.preventDefault();
+			show( link.dataset.authMode, true, true );
+		} );
+	} );
+
+	show( document.body.classList.contains( 'account-auth-register' ) ? 'register' : 'login', false, false );
+} )();
+
 /* Ссылка «Купить» из каталога попадает к форме после загрузки всех изображений товара. */
 ( function () {
 	'use strict';
@@ -97,6 +154,7 @@
 	}
 
 	var colors = window.carpediemUI ? window.carpediemUI.colors : {};
+	var selectionNote = form.querySelector( '.js-product-selection-note' );
 
 	var groups = [];
 
@@ -150,6 +208,11 @@
 				btn.setAttribute( 'aria-pressed', String( active ) );
 			} );
 		} );
+		if ( selectionNote ) {
+			selectionNote.hidden = groups.length > 0 && groups.every( function ( group ) {
+				return Boolean( group.select.value );
+			} );
+		}
 	}
 
 	form.addEventListener( 'change', sync );
@@ -329,76 +392,6 @@
 			window.jQuery( document.body ).trigger( 'wc_fragment_refresh' );
 		} );
 	}
-} )();
-
-/* «Купить в 1 клик»: нативный <dialog> + отправка в admin-ajax. */
-( function () {
-	'use strict';
-
-	var dialog = document.getElementById( 'one-click' );
-	var open = document.querySelector( '.js-one-click-open' );
-	if ( ! dialog || ! open ) {
-		return;
-	}
-
-	var form = dialog.querySelector( '.js-one-click-form' );
-	var error = dialog.querySelector( '.js-one-click-error' );
-	var submit = dialog.querySelector( '.js-one-click-submit' );
-
-	function showError( text ) {
-		error.textContent = text;
-		error.hidden = ! text;
-	}
-
-	open.addEventListener( 'click', function () {
-		// Подхватываем выбранную вариацию, если размер и цвет уже выбраны.
-		var variation = document.querySelector( 'input[name="variation_id"]' );
-		if ( variation ) {
-			form.elements.variation_id.value = variation.value || 0;
-		}
-		showError( '' );
-		dialog.showModal();
-	} );
-
-	dialog.querySelector( '.js-one-click-close' ).addEventListener( 'click', function () {
-		dialog.close();
-	} );
-
-	form.addEventListener( 'submit', function ( e ) {
-		e.preventDefault();
-
-		if ( ! form.reportValidity() ) {
-			return;
-		}
-
-		var data = new FormData( form );
-		data.append( 'action', 'carpediem_one_click' );
-
-		submit.disabled = true;
-		showError( '' );
-
-		fetch( dialog.dataset.ajax, { method: 'POST', body: data, credentials: 'same-origin' } )
-			.then( function ( r ) { return r.json(); } )
-			.then( function ( res ) {
-				if ( res && res.success ) {
-					var successTitle = ( window.carpediemUI && window.carpediemUI.quickOrderSuccessTitle ) || 'Готово';
-					var closeLabel = ( window.carpediemUI && window.carpediemUI.quickOrderCloseLabel ) || 'Закрыть';
-					form.innerHTML = '<h2 class="one-click__title">' + successTitle + '</h2><p class="one-click__text">' + res.data.message +
-						'</p><button type="button" class="btn js-one-click-done">' + closeLabel + '</button>';
-					form.querySelector( '.js-one-click-done' ).addEventListener( 'click', function () {
-						dialog.close();
-						window.location.reload();
-					} );
-				} else {
-					showError( ( res && res.data && res.data.message ) || ( window.carpediemUI && window.carpediemUI.quickOrderGenericError ) || 'Не получилось отправить. Попробуйте ещё раз.' );
-					submit.disabled = false;
-				}
-			} )
-			.catch( function () {
-				showError( ( window.carpediemUI && window.carpediemUI.quickOrderNetworkError ) || 'Сеть недоступна. Попробуйте ещё раз.' );
-				submit.disabled = false;
-			} );
-	} );
 } )();
 
 /* Переключатель светлой и тёмной темы. Выбор запоминается в localStorage. */

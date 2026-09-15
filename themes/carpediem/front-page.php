@@ -4,6 +4,10 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 $hero_image = carpediem_setting( 'hero_image' );
 $brand_image = carpediem_setting( 'brand_image' );
+$lookbook_images = array();
+for ( $lookbook_index = 1; $lookbook_index <= 4; $lookbook_index++ ) {
+	$lookbook_images[] = absint( carpediem_setting( 'lookbook_image_' . $lookbook_index ) );
+}
 ?>
 <section class="hero hero--editorial">
 	<div class="container hero__layout<?php echo $hero_image ? '' : ' hero__layout--text-only'; ?>">
@@ -22,7 +26,7 @@ $brand_image = carpediem_setting( 'brand_image' );
 		<?php endif; ?>
 		<?php if ( $hero_image ) : ?>
 			<div class="hero__art hero__art--photo">
-				<?php echo wp_get_attachment_image( $hero_image, 'large', false, array( 'class' => 'hero__image', 'fetchpriority' => 'high', 'loading' => 'eager', 'sizes' => '(max-width: 899px) 100vw, 50vw' ) ); ?>
+				<?php echo wp_get_attachment_image( $hero_image, 'large', false, array( 'class' => 'hero__image', 'fetchpriority' => 'high', 'loading' => 'eager', 'sizes' => '(max-width: 699px) 100vw, 1200px' ) ); ?>
 				<span class="hero__art-label">CARPE DIEM / <?php echo esc_html( carpediem_setting( 'collection' ) ); ?></span>
 				<span class="hero__art-cross" aria-hidden="true">✟</span>
 			</div>
@@ -32,7 +36,7 @@ $brand_image = carpediem_setting( 'brand_image' );
 
 <section class="section home-selection" id="selection">
 	<div class="container">
-		<div class="section-heading"><div><p class="eyebrow">Вещи со смыслом</p><h2><?php echo esc_html( carpediem_setting( 'selection_title' ) ); ?></h2></div><a class="text-link" href="<?php echo esc_url( home_url( '/catalog/' ) ); ?>">Весь каталог ↗</a></div>
+		<div class="section-heading"><div><h2><?php echo esc_html( carpediem_setting( 'selection_title' ) ); ?></h2></div><a class="text-link" href="<?php echo esc_url( home_url( '/catalog/' ) ); ?>">Весь каталог ↗</a></div>
 		<div class="woocommerce">
 		<?php
 		$ids = array_filter( (array) carpediem_setting( 'product_ids' ), function ( $id ) {
@@ -52,18 +56,47 @@ $brand_image = carpediem_setting( 'brand_image' );
 <?php $cats = carpediem_home_categories(); if ( $cats ) : ?>
 <section class="section categories" id="collections">
 	<div class="container">
-		<div class="section-heading"><div><p class="eyebrow">Собери свой образ</p><h2>Категории</h2></div><span class="section-heading__note">Твой стиль. Твой выбор.</span></div>
+		<div class="section-heading"><div><h2>Категории</h2></div></div>
 		<div class="categories__grid">
-			<?php foreach ( $cats as $i => $cat ) : $thumb_id = get_term_meta( $cat->term_id, 'thumbnail_id', true ); ?>
+			<?php foreach ( $cats as $cat ) : $thumb_id = get_term_meta( $cat->term_id, 'thumbnail_id', true ); ?>
 				<a class="cat-card" href="<?php echo esc_url( get_term_link( $cat ) ); ?>">
-					<span class="cat-card__media"><?php if ( $thumb_id ) { echo wp_get_attachment_image( $thumb_id, 'woocommerce_thumbnail', false, array( 'class' => 'cat-card__img', 'loading' => 'lazy' ) ); } else { echo '<span class="cat-card__placeholder" aria-hidden="true">✟</span>'; } ?></span>
-					<span class="cat-card__body"><span class="cat-card__number"><?php echo esc_html( sprintf( '%02d', $i + 1 ) ); ?></span><span class="cat-card__name"><?php echo esc_html( $cat->name ); ?></span><span class="cat-card__arrow" aria-hidden="true">↗</span></span>
+					<span class="cat-card__media">
+						<?php if ( $thumb_id ) { echo wp_get_attachment_image( $thumb_id, 'woocommerce_thumbnail', false, array( 'class' => 'cat-card__img', 'loading' => 'lazy' ) ); } else { echo '<span class="cat-card__placeholder" aria-hidden="true">✟</span>'; } ?>
+						<span class="cat-card__body">
+							<span class="cat-card__name"><?php echo esc_html( $cat->name ); ?></span>
+							<span class="cat-card__link">Перейти <span aria-hidden="true">↗</span></span>
+						</span>
+					</span>
 				</a>
 			<?php endforeach; ?>
 		</div>
 	</div>
 </section>
 <?php endif; ?>
+
+<section class="section home-lookbook" id="lookbook">
+	<div class="container">
+		<div class="section-heading">
+			<div><p class="eyebrow">Люди CARPE DIEM</p><h2><?php echo esc_html( carpediem_setting( 'lookbook_title' ) ); ?></h2></div>
+			<a class="text-link" href="<?php echo esc_url( home_url( '/lookbook/' ) ); ?>">Весь лукбук ↗</a>
+		</div>
+		<p class="home-lookbook__intro"><?php echo esc_html( carpediem_setting( 'lookbook_text' ) ); ?></p>
+		<div class="lookbook-rail" aria-label="Фотографии клиентов" tabindex="0">
+			<?php foreach ( $lookbook_images as $lookbook_offset => $lookbook_image ) : $lookbook_number = $lookbook_offset + 1; ?>
+				<figure class="lookbook-card<?php echo $lookbook_image ? ' lookbook-card--photo' : ' lookbook-card--empty'; ?>">
+					<?php if ( $lookbook_image ) : ?>
+						<?php echo wp_get_attachment_image( $lookbook_image, 'large', false, array( 'class' => 'lookbook-card__image', 'loading' => 'lazy', 'alt' => sprintf( 'Фото клиента CARPE DIEM %d', $lookbook_number ), 'sizes' => '(max-width: 699px) 82vw, 32vw' ) ); ?>
+					<?php else : ?>
+						<span class="lookbook-card__placeholder" role="img" aria-label="Место для фотографии клиента <?php echo esc_attr( $lookbook_number ); ?>">
+							<span>CLIENT FRAME</span><small><?php echo esc_html( sprintf( '%02d', $lookbook_number ) ); ?></small>
+						</span>
+					<?php endif; ?>
+					<figcaption><span>CARPE DIEM / COMMUNITY</span><strong><?php echo esc_html( sprintf( '%02d', $lookbook_number ) ); ?></strong></figcaption>
+				</figure>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
 
 <div class="marquee" aria-hidden="true"><div class="marquee__track">
 	<?php for ( $i = 0; $i < 2; $i++ ) : ?><span class="marquee__group"><?php for ( $j = 0; $j < 6; $j++ ) : ?><span>Carpe Diem</span><span class="marquee__cross">✟</span><span>Style of Soul</span><span class="marquee__cross">✟</span><?php endfor; ?></span><?php endfor; ?>

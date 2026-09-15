@@ -81,13 +81,6 @@ add_action( 'wp_head', function () {
 	}
 }, 5 );
 
-// Фавикон и иконка для айфонов (site_icon в админке не заводим — файлы лежат в теме).
-add_action( 'wp_head', function () {
-	printf( '<link rel="icon" href="%s" sizes="any" type="image/svg+xml">' . "\n", esc_url( get_theme_file_uri( 'assets/img/favicon.svg' ) ) );
-	printf( '<link rel="icon" href="%s" sizes="512x512" type="image/png">' . "\n", esc_url( get_theme_file_uri( 'assets/img/favicon-512.png' ) ) );
-	printf( '<link rel="apple-touch-icon" href="%s">' . "\n", esc_url( get_theme_file_uri( 'assets/img/favicon-512.png' ) ) );
-}, 6 );
-
 // Корзину, оформление, аккаунт и результаты поиска в индекс не пускаем.
 add_filter( 'wp_robots', function ( $robots ) {
 	if ( function_exists( 'is_cart' ) && ( is_cart() || is_checkout() || is_account_page() ) || is_search() ) {

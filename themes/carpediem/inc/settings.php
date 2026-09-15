@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) || exit;
 
 function carpediem_setting_defaults() {
 	return array(
-		'announcement' => 'CARPE DIEM · Style of Soul',
+		'announcement' => 'CARPE DIEM',
 		'collection' => 'Коллекция 2026',
 		'hero_title' => 'Одежда с характером.',
 		'hero_text' => 'Для тех, кто выбирает свой путь. Стиль, свобода и смысл — в каждой детали.',
@@ -13,7 +13,7 @@ function carpediem_setting_defaults() {
 		'hero_image' => 0,
 		'theme_dark_label' => 'Демон',
 		'theme_light_label' => 'Ангел',
-		'selection_title' => 'Выбор CARPE DIEM',
+		'selection_title' => 'Популярные товары',
 		'product_ids' => array(),
 		'category_ids' => null,
 		'community_title' => 'Спасибо за то, что ты с нами',
@@ -21,17 +21,19 @@ function carpediem_setting_defaults() {
 		'brand_title' => 'Carpe Diem — Style of Soul',
 		'brand_text' => 'Каждая вещь — это больше, чем одежда. Это часть пути, которую мы создаём вместе.',
 		'brand_image' => 0,
+		'lookbook_title' => 'Лукбук сообщества',
+		'lookbook_text' => 'CARPE DIEM в жизни — образы людей, которые носят бренд по-своему.',
+		'lookbook_image_1' => 0,
+		'lookbook_image_2' => 0,
+		'lookbook_image_3' => 0,
+		'lookbook_image_4' => 0,
 		'phone' => '', 'email' => '', 'address' => '', 'hours' => '',
-		'telegram' => '', 'vk' => '', 'instagram' => '',
+		'telegram' => '', 'vk' => '', 'instagram' => '', 'tiktok' => '',
 		'delivery_note' => 'По России и миру. Способ и стоимость — при оформлении.',
 		'returns_note' => 'Не подошёл размер? Посмотри условия обмена и возврата.',
 
 		// Тексты каталога и карточки товара.
 		'catalog_all_label' => 'Все вещи',
-		'catalog_filters_label' => 'Фильтры',
-		'catalog_filter_apply_label' => 'Показать товары',
-		'catalog_filter_reset_label' => 'Сбросить всё',
-		'catalog_filter_clear_label' => 'Очистить',
 		'catalog_add_to_cart_label' => 'В корзину',
 		'catalog_buy_label' => 'Купить',
 		'catalog_details_label' => 'Подробнее',
@@ -103,7 +105,11 @@ function carpediem_setting_defaults() {
 function carpediem_setting( $key ) {
 	$options = get_option( 'carpediem_settings', array() );
 	$defaults = carpediem_setting_defaults();
-	return is_array( $options ) && array_key_exists( $key, $options ) ? $options[ $key ] : ( $defaults[ $key ] ?? '' );
+	$value = is_array( $options ) && array_key_exists( $key, $options ) ? $options[ $key ] : ( $defaults[ $key ] ?? '' );
+	if ( 'selection_title' === $key && in_array( $value, array( 'Выбор CARPE DIEM', 'Выбор CAPRE DIEM' ), true ) ) {
+		return $defaults[ $key ];
+	}
+	return $value;
 }
 
 function carpediem_home_categories() {

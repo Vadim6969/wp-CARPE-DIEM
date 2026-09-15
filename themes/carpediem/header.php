@@ -10,7 +10,17 @@
 <?php wp_body_open(); ?>
 
 <a class="skip-link" href="#content">Перейти к содержимому</a>
-<?php if ( carpediem_setting( 'announcement' ) ) : ?><div class="announcement" role="region" aria-label="Объявление магазина"><?php echo esc_html( carpediem_setting( 'announcement' ) ); ?></div><?php endif; ?>
+<?php
+$header_brand = trim( (string) carpediem_setting( 'announcement' ) );
+if ( ! $header_brand || 'CARPE DIEM · Style of Soul' === $header_brand ) {
+	$header_brand = get_bloginfo( 'name' );
+}
+?>
+<div class="announcement" role="region" aria-label="Название бренда">
+	<span class="announcement__cross" aria-hidden="true">&#10015;</span>
+	<span class="announcement__name"><?php echo esc_html( $header_brand ); ?></span>
+	<span class="announcement__cross" aria-hidden="true">&#10015;</span>
+</div>
 
 <header class="site-header js-header">
 	<div class="container site-header__inner">
@@ -27,13 +37,6 @@
 				<div class="mobile-nav-actions__theme"><span>Тема</span><?php carpediem_theme_toggle( 'theme-toggle--mobile' ); ?></div>
 			</div>
 		</nav>
-
-		<a class="site-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-			<span class="site-logo__cross">&#10015;</span>
-			<span class="site-logo__name"><?php bloginfo( 'name' ); ?></span>
-			<span class="site-logo__cross">&#10015;</span>
-			<span class="site-logo__year">Style of Soul</span>
-		</a>
 
 		<div class="site-header__actions">
 			<?php carpediem_theme_toggle(); ?>

@@ -39,7 +39,6 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'carpediem', get_theme_file_uri( 'assets/js/main.js' ), array( 'jquery' ), carpediem_asset_version( 'assets/js/main.js' ), true );
 	wp_localize_script( 'carpediem', 'carpediemUI', array(
 		'colors' => carpediem_color_swatches(),
-		'catalogFiltersLabel' => carpediem_setting( 'catalog_filters_label' ),
 		'quickOrderSuccessTitle' => carpediem_setting( 'quick_order_success_title' ),
 		'quickOrderCloseLabel' => carpediem_setting( 'quick_order_close_label' ),
 		'quickOrderGenericError' => carpediem_setting( 'quick_order_generic_error' ),
@@ -77,7 +76,6 @@ add_filter( 'woocommerce_add_to_cart_fragments', function ( $fragments ) {
 require get_theme_file_path( 'inc/settings.php' );
 require get_theme_file_path( 'inc/admin.php' );
 require get_theme_file_path( 'inc/woo.php' );
-require get_theme_file_path( 'inc/filters.php' );
 require get_theme_file_path( 'inc/one-click.php' );
 require get_theme_file_path( 'inc/favorites.php' );
 require get_theme_file_path( 'inc/seo.php' );
@@ -106,6 +104,7 @@ function carpediem_icon( $name, $size = 16 ) {
 		'heart'     => '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>',
 		'instagram' => '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/>',
 		'telegram'  => '<path d="M21 5L3 12l5 2 2 5 3-4 5 4z"/><path d="M8 14l10-9"/>',
+		'tiktok'    => '<path d="M14 4v10.5a4.5 4.5 0 1 1-3.8-4.45"/><path d="M14 4c.7 2.5 2.2 4 5 4.5"/>',
 		'vk'        => '<path d="M4 8h3c.6 3.4 2 5.6 3.5 6.3V8h3v3.7c1.4-.2 2.7-1.7 3.2-3.7h3c-.5 2.3-1.7 3.9-2.9 4.8 1.3.9 2.4 2.3 3 5.2h-3.3c-.5-2-1.6-3.3-3-3.6V18H11C7.4 18 4.8 14.4 4 8z"/>',
 	);
 
@@ -146,6 +145,21 @@ function carpediem_socials() {
 	return array_filter( array(
 		'instagram' => carpediem_setting( 'instagram' ),
 		'telegram'  => carpediem_setting( 'telegram' ),
+		'tiktok'    => carpediem_setting( 'tiktok' ),
 		'vk'        => carpediem_setting( 'vk' ),
 	) );
 }
+
+/** Убираем из футера устаревшие ссылки, сохраняя меню редактируемым для будущих документов. */
+add_filter( 'wp_nav_menu_objects', function ( $items, $args ) {
+	if ( 'footer-support' !== ( $args->theme_location ?? '' ) ) {
+		return $items;
+	}
+
+	$hidden_slugs = array( 'faq', 'care', 'partnership' );
+
+	return array_values( array_filter( $items, function ( $item ) use ( $hidden_slugs ) {
+		$path = untrailingslashit( (string) wp_parse_url( $item->url, PHP_URL_PATH ) );
+		return ! in_array( basename( $path ), $hidden_slugs, true );
+	} ) );
+}, 10, 2 );

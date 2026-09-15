@@ -5,7 +5,7 @@ defined( 'ABSPATH' ) || exit;
 function carpediem_admin_sections() {
 	return array(
 		'hero' => array( 'Первый экран', 'Сразу покажи характер коллекции и предложи перейти к вещам.', array(
-			'announcement' => array( 'Строка над шапкой', 'text' ), 'collection' => array( 'Название коллекции', 'text' ),
+			'announcement' => array( 'Название бренда над шапкой', 'text' ), 'collection' => array( 'Название коллекции', 'text' ),
 			'hero_title' => array( 'Заголовок', 'text' ), 'hero_text' => array( 'Короткое описание', 'textarea' ),
 			'hero_button' => array( 'Текст кнопки', 'text' ), 'hero_url' => array( 'Ссылка кнопки', 'url' ),
 			'hero_image' => array( 'Фотография коллекции', 'image' ),
@@ -23,16 +23,20 @@ function carpediem_admin_sections() {
 			'brand_image' => array( 'Изображение', 'image' ), 'community_title' => array( 'Заголовок сообщества', 'text' ),
 			'community_text' => array( 'Текст сообщества', 'textarea' ),
 		) ),
+		'lookbook' => array( 'Лукбук', 'Добавьте до четырёх фотографий клиентов — они появятся отдельной галереей на главной.', array(
+			'lookbook_title' => array( 'Заголовок', 'text' ), 'lookbook_text' => array( 'Короткое описание', 'textarea' ),
+			'lookbook_image_1' => array( 'Фото клиента 1', 'image' ), 'lookbook_image_2' => array( 'Фото клиента 2', 'image' ),
+			'lookbook_image_3' => array( 'Фото клиента 3', 'image' ), 'lookbook_image_4' => array( 'Фото клиента 4', 'image' ),
+		) ),
 		'contacts' => array( 'Контакты и условия', 'Контакты появятся в подвале и на странице «Контакты». Условия — рядом с покупкой.', array(
 			'phone' => array( 'Телефон', 'tel' ), 'email' => array( 'Email', 'email' ),
 			'address' => array( 'Адрес', 'textarea' ), 'hours' => array( 'Время работы', 'text' ),
 			'telegram' => array( 'Telegram', 'url' ), 'vk' => array( 'ВКонтакте', 'url' ), 'instagram' => array( 'Instagram', 'url' ),
+			'tiktok' => array( 'TikTok', 'url' ),
 			'delivery_note' => array( 'Коротко о доставке', 'textarea' ), 'returns_note' => array( 'Коротко об обмене и возврате', 'textarea' ),
 		) ),
-		'catalog_copy' => array( 'Каталог', 'Названия кнопок и фильтров, которые покупатель видит в списке товаров.', array(
-			'catalog_all_label' => array( 'Все товары', 'text' ), 'catalog_filters_label' => array( 'Кнопка фильтров', 'text' ),
-			'catalog_filter_apply_label' => array( 'Применить фильтры', 'text' ), 'catalog_filter_reset_label' => array( 'Сбросить фильтры', 'text' ),
-			'catalog_filter_clear_label' => array( 'Очистить активные фильтры', 'text' ), 'catalog_add_to_cart_label' => array( 'Добавить простой товар', 'text' ),
+		'catalog_copy' => array( 'Каталог', 'Названия категорий и действий с товаром.', array(
+			'catalog_all_label' => array( 'Все товары', 'text' ), 'catalog_add_to_cart_label' => array( 'Добавить простой товар', 'text' ),
 			'catalog_buy_label' => array( 'Выбрать и купить', 'text' ), 'catalog_details_label' => array( 'Недоступный товар', 'text' ),
 		) ),
 		'product_copy' => array( 'Карточка товара', 'Основные действия и информационные блоки на странице вещи.', array(
@@ -210,7 +214,7 @@ function carpediem_admin_field( $key, $field ) {
 				<div class="cd-media__preview"><?php if ( $value ) { echo wp_get_attachment_image( $value, 'medium' ); } ?></div>
 				<button class="button cd-media-pick" type="button">Выбрать изображение</button>
 				<button class="button-link cd-media-clear" type="button" <?php echo $value ? '' : 'hidden'; ?>>Убрать</button>
-				<p class="description">Фотография вещи или образа. Без изображения используется фирменная монограмма.</p>
+				<p class="description"><?php echo 0 === strpos( $key, 'lookbook_image_' ) ? 'Вертикальный кадр клиента. До загрузки на витрине будет нейтральный слот.' : 'Фотография вещи или образа. Если её нет, блок адаптируется без изображения.'; ?></p>
 			</div>
 		<?php elseif ( 'products' === $type ) : ?>
 			<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="">

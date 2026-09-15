@@ -27,8 +27,8 @@ echo "Проверяем $BASE"
 
 check /
 check /catalog/
-check "/catalog/?size%5B%5D=xs&max_price=6000"
 check /product-category/hoodie/
+check /product-category/tshirt/
 check /product/split-camo-thermochromic/
 check /cart/
 check /favorites/
@@ -53,13 +53,13 @@ else
 	printf '  ✓ %-46s товаров на странице=%s\n' "каталог не пустой" "$count"
 fi
 
-# Даже при пустой выдаче покупатель должен видеть фильтры и возможность сбросить их.
-empty_result=$(curl -s -L "$BASE/catalog/?max_price=100")
-if ! printf '%s' "$empty_result" | grep -q 'class="filters"' || ! printf '%s' "$empty_result" | grep -q 'class="filters__reset"'; then
-	echo "  ✗ фильтры или сброс пропали в пустой выдаче"
+# В упрощённом каталоге не должно быть фильтров, сортировки и лишних действий в карточке.
+catalog_markup=$(curl -s -L "$BASE/catalog/")
+if printf '%s' "$catalog_markup" | grep -qE 'class="filters|woocommerce-ordering|loop-buy|loop-sizes|loop-favorite|loop-card__cat'; then
+	echo "  ✗ в упрощённом каталоге остались фильтры, сортировка или лишние элементы карточек"
 	FAILED=1
 else
-	printf '  ✓ %-46s\n' "фильтры доступны в пустой выдаче"
+	printf '  ✓ %-46s\n' "каталог без фильтров и лишних действий"
 fi
 
 if [ "$FAILED" = "0" ]; then

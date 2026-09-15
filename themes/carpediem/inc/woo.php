@@ -27,10 +27,17 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_dequeue_style( 'woocommerce-smallscreen' );
 }, 20 );
 
-// Каталог: 12 товаров, 4 колонки, без сайдбара.
+/** Главная страница каталога и архивы его категорий. */
+function carpediem_is_catalog_archive() {
+	return is_shop() || is_product_taxonomy();
+}
+
+// Каталог: 12 товаров, три колонки; другие подборки сохраняют четыре.
 add_filter( 'loop_shop_per_page', fn() => 12, 20 );
-add_filter( 'loop_shop_columns', fn() => 4, 20 );
+add_filter( 'loop_shop_columns', fn() => carpediem_is_catalog_archive() ? 3 : 4, 20 );
 remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
+remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
 // Итоги уже выведены в правой колонке нашего шаблона корзины.
 remove_action( 'woocommerce_cart_collaterals', 'woocommerce_cart_totals', 10 );
 
@@ -79,6 +86,10 @@ remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_ad
 
 // Над названием — категория, как на макете.
 add_action( 'woocommerce_shop_loop_item_title', function () {
+	if ( carpediem_is_catalog_archive() ) {
+		return;
+	}
+
 	global $product;
 	$terms = get_the_terms( $product->get_id(), 'product_cat' );
 	if ( $terms && ! is_wp_error( $terms ) ) {
@@ -88,6 +99,10 @@ add_action( 'woocommerce_shop_loop_item_title', function () {
 
 // Бейдж «Новинка» на карточке и на странице товара.
 function carpediem_new_badge() {
+	if ( carpediem_is_catalog_archive() ) {
+		return;
+	}
+
 	global $product;
 	if ( $product && has_term( 'новинка', 'product_tag', $product->get_id() ) ) {
 		echo '<span class="badge-new">' . esc_html( carpediem_setting( 'product_new_label' ) ) . '</span>';
@@ -97,6 +112,10 @@ add_action( 'woocommerce_before_shop_loop_item_title', 'carpediem_new_badge', 15
 
 // После закрывающей ссылки: кнопка избранного не вложена в ссылку товара.
 add_action( 'woocommerce_after_shop_loop_item', function () {
+	if ( carpediem_is_catalog_archive() ) {
+		return;
+	}
+
 	global $product;
 	carpediem_favorite_button( $product->get_id(), true );
 	if ( ! $product->is_type( 'variable' ) ) { return; }
@@ -114,6 +133,10 @@ add_action( 'woocommerce_after_shop_loop_item', function () {
  * Простой товар добавляется сразу, для вариативного сначала открывается выбор размера/цвета.
  */
 function carpediem_loop_purchase_button() {
+	if ( carpediem_is_catalog_archive() ) {
+		return;
+	}
+
 	global $product;
 
 	if ( ! $product instanceof WC_Product || ! $product->is_visible() ) {
@@ -153,6 +176,14 @@ function carpediem_loop_purchase_button() {
 	);
 }
 add_action( 'woocommerce_after_shop_loop_item', 'carpediem_loop_purchase_button', 25 );
+
+add_filter( 'body_class', function ( $classes ) {
+	if ( carpediem_is_catalog_archive() ) {
+		$classes[] = 'carpediem-catalog';
+	}
+
+	return $classes;
+} );
 
 add_action( 'woocommerce_before_variations_form', function () {
 	global $product;

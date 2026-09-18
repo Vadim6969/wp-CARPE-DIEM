@@ -6,22 +6,22 @@ defined( 'ABSPATH' ) || exit;
 
 $items = array(
 	array(
-		'icon'  => '<path d="M12 2v20M6 8h12"/>',
+		'image' => 'style-of-soul.jpg',
 		'title' => 'Стиль души',
 		'text'  => 'Одежда — это отражение того, кем ты являешься.',
 	),
 	array(
-		'icon'  => '<path d="M12 2l1.8 7.2L21 12l-7.2 1.8L12 22l-1.8-8.2L3 12l7.2-2.8z"/><path d="M12 2v20M3 12h18"/>',
+		'image' => 'be-yourself.jpg',
 		'title' => 'Будь собой',
 		'text'  => 'Не подстраивайся под окружающих. Создавай свой собственный стиль.',
 	),
 	array(
-		'icon'  => '<path d="M6 3h12M6 21h12M7 3c0 5 2 6 5 9-3 3-5 4-5 9M17 3c0 5-2 6-5 9 3 3 5 4 5 9"/>',
+		'image' => 'seize-the-moment.jpg',
 		'title' => 'Лови момент',
 		'text'  => 'Не откладывай жизнь на потом. Живи сейчас.',
 	),
 	array(
-		'icon'  => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.5 4 5.5 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.5-4-9s1.4-6.5 4-9"/>',
+		'image' => 'your-story.jpg',
 		'title' => 'Твоя история',
 		'text'  => 'Каждый человек проходит свой жизненный путь. Мы хотим быть частью твоего пути.',
 	),
@@ -38,11 +38,9 @@ $items = array(
 		<div class="usp__grid">
 			<?php foreach ( $items as $index => $item ) : ?>
 				<article class="usp__item">
-					<?php if ( 0 === $index ) : ?>
-						<span class="usp__icon brand-cross brand-cross--classic" aria-hidden="true"></span>
-					<?php else : ?>
-						<svg class="usp__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></svg>
-					<?php endif; ?>
+					<span class="usp__icon" aria-hidden="true">
+						<img class="usp__icon-image usp__icon-image--<?php echo esc_attr( $index + 1 ); ?>" src="<?php echo esc_url( get_theme_file_uri( 'assets/img/philosophy/' . $item['image'] ) ); ?>" width="128" height="128" loading="lazy" alt="">
+					</span>
 					<h3 class="usp__title"><?php echo esc_html( $item['title'] ); ?></h3>
 					<p class="usp__text"><?php echo esc_html( $item['text'] ); ?></p>
 				</article>

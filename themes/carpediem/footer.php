@@ -10,6 +10,8 @@ if ( preg_match( '/\b(20\d{2})\b/u', $footer_collection, $footer_year_match ) ) 
 	$footer_year = $footer_year_match[1];
 }
 $footer_socials = carpediem_socials();
+$footer_telegram = $footer_socials['telegram'] ?? '';
+unset( $footer_socials['telegram'] );
 $social_labels  = array(
 	'instagram' => 'Instagram',
 	'telegram'  => 'Telegram',
@@ -50,6 +52,11 @@ $social_labels  = array(
 		<nav class="site-footer__col" aria-label="Поддержка">
 			<h2 class="site-footer__title">Поддержка</h2>
 			<?php wp_nav_menu( array( 'theme_location' => 'footer-support', 'container' => false, 'fallback_cb' => false, 'depth' => 1 ) ); ?>
+			<?php if ( $footer_telegram ) : ?>
+				<a class="socials__link site-footer__telegram" href="<?php echo esc_url( $footer_telegram ); ?>" aria-label="Telegram" rel="noopener nofollow" target="_blank">
+					<?php echo carpediem_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</a>
+			<?php endif; ?>
 		</nav>
 
 	</div>

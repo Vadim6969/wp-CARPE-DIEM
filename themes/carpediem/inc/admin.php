@@ -10,10 +10,6 @@ function carpediem_admin_sections() {
 			'hero_button' => array( 'Текст кнопки', 'text' ), 'hero_url' => array( 'Ссылка кнопки', 'url' ),
 			'hero_image' => array( 'Фотография коллекции', 'image' ),
 		) ),
-		'appearance' => array( 'Демон / Ангел', 'Подписи переключателя тем. Тёмная тема остаётся основной.', array(
-			'theme_dark_label' => array( 'Название тёмной темы', 'text' ),
-			'theme_light_label' => array( 'Название светлой темы', 'text' ),
-		) ),
 		'selection' => array( 'Товары и категории', 'Собери подборку для главной и расставь категории в нужном порядке.', array(
 			'selection_title' => array( 'Заголовок подборки', 'text' ), 'product_ids' => array( 'Товары на главной', 'products' ),
 			'category_ids' => array( 'Категории на главной', 'categories' ),
@@ -41,7 +37,7 @@ function carpediem_admin_sections() {
 		) ),
 		'product_copy' => array( 'Карточка товара', 'Основные действия и информационные блоки на странице вещи.', array(
 			'product_new_label' => array( 'Бейдж нового товара', 'text' ), 'product_buy_now_label' => array( 'Основная кнопка покупки', 'text' ),
-			'product_size_guide_label' => array( 'Ссылка на размеры', 'text' ), 'product_related_label' => array( 'Заголовок рекомендаций', 'text' ),
+			'product_size_guide_label' => array( 'Ссылка на гайд по меркам', 'text' ), 'product_related_label' => array( 'Заголовок рекомендаций', 'text' ),
 			'product_delivery_label' => array( 'Ссылка на доставку', 'text' ), 'product_returns_label' => array( 'Ссылка на возврат', 'text' ),
 			'product_share_label' => array( 'Поделиться', 'text' ), 'product_description_label' => array( 'Описание', 'text' ),
 			'product_materials_label' => array( 'Материалы и уход', 'text' ), 'product_material_label' => array( 'Состав', 'text' ),

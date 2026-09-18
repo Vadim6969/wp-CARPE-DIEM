@@ -192,11 +192,6 @@ add_filter( 'body_class', function ( $classes ) {
 	return $classes;
 } );
 
-add_action( 'woocommerce_before_variations_form', function () {
-	global $product;
-	if ( carpediem_size_table( $product ) ) { echo '<a class="size-guide-link" href="#product-sizes">' . esc_html( carpediem_setting( 'product_size_guide_label' ) ) . ' ↗</a>'; }
-} );
-
 add_action( 'woocommerce_single_product_summary', function () {
 	echo '<div class="product-service">';
 	foreach ( array( 'delivery' => array( 'product_delivery_label', 'delivery_note' ), 'returns' => array( 'product_returns_label', 'returns_note' ) ) as $path => $item ) {
@@ -217,10 +212,10 @@ add_action( 'woocommerce_archive_description', function () {
 	echo '</nav>';
 }, 20 );
 
-// Существующее меню сохраняется в WordPress, исправляется только дублирующая ссылка.
+// Пункт «Коллекции» всегда ведёт на отдельную страницу направлений бренда.
 add_filter( 'nav_menu_link_attributes', function ( $attrs, $item, $args ) {
-	if ( 'primary' === ( $args->theme_location ?? '' ) && 'COLLECTIONS' === strtoupper( $item->title ) && untrailingslashit( (string) wp_parse_url( $item->url, PHP_URL_PATH ) ) === untrailingslashit( (string) wp_parse_url( home_url( '/catalog/' ), PHP_URL_PATH ) ) ) {
-		$attrs['href'] = home_url( carpediem_home_categories() ? '/#collections' : '/#selection' );
+	if ( 'primary' === ( $args->theme_location ?? '' ) && in_array( strtoupper( $item->title ), array( 'COLLECTIONS', 'КОЛЛЕКЦИИ' ), true ) ) {
+		$attrs['href'] = home_url( '/collections/' );
 	}
 	return $attrs;
 }, 10, 3 );
@@ -360,7 +355,7 @@ function carpediem_product_features() {
 	}
 	echo '<ul class="features">';
 	foreach ( $values as $value ) {
-		echo '<li><span class="features__cross" aria-hidden="true">&#10015;</span>' . esc_html( $value ) . '</li>';
+    echo '<li><span class="features__cross" aria-hidden="true">&#8226;</span>' . esc_html( $value ) . '</li>';
 	}
 	echo '</ul>';
 }

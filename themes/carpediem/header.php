@@ -19,7 +19,7 @@ if ( ! $header_brand || 'CARPE DIEM · Style of Soul' === $header_brand ) {
 <div class="announcement" role="region" aria-label="Название бренда">
 	<span class="announcement__cross brand-cross brand-cross--classic" aria-hidden="true"></span>
 	<span class="announcement__name"><?php echo esc_html( $header_brand ); ?></span>
-	<span class="announcement__cross brand-cross brand-cross--massive" aria-hidden="true"></span>
+	<span class="announcement__cross brand-cross brand-cross--classic" aria-hidden="true"></span>
 </div>
 
 <header class="site-header js-header">
@@ -29,18 +29,18 @@ if ( ! $header_brand || 'CARPE DIEM · Style of Soul' === $header_brand ) {
 			<span></span><span></span><span></span>
 			<span class="screen-reader-text">Меню</span>
 		</button>
+		<a class="site-header__home-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="На главную страницу">
+			<img src="<?php echo esc_url( get_theme_file_uri( 'assets/img/brand-monogram-line.png' ) ); ?>" width="1024" height="1024" alt="">
+		</a>
 
 		<nav class="site-nav js-nav" id="site-nav" aria-label="Основное меню">
 			<?php wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false, 'fallback_cb' => false, 'depth' => 1 ) ); ?>
 			<div class="mobile-nav-actions">
 				<a href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>">Личный кабинет ↗</a>
-				<div class="mobile-nav-actions__theme"><span>Тема</span><?php carpediem_theme_toggle( 'theme-toggle--mobile' ); ?></div>
 			</div>
 		</nav>
 
 		<div class="site-header__actions">
-			<?php carpediem_theme_toggle(); ?>
-
 			<details class="hsearch">
 				<summary aria-label="Поиск"><?php echo carpediem_icon( 'search' ); // phpcs:ignore ?><span>Поиск</span></summary>
 				<div class="hsearch__panel"><?php get_search_form(); ?></div>

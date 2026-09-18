@@ -27,6 +27,7 @@ echo "Проверяем $BASE"
 
 check /
 check /catalog/
+check /collections/
 check /product-category/hoodie/
 check /product-category/tshirt/
 check /product/split-camo-thermochromic/
@@ -62,6 +63,16 @@ else
 	printf '  ✓ %-46s\n' "инструкция по снятию мерок обновлена"
 fi
 
+# Страница и ссылка в подвале должны быть названы по её содержанию, а не общей таблицей.
+home_markup=$(curl -s -L "$BASE/")
+footer_size_guide_link="href=\"${BASE}/size-guide/\">Как снять мерки</a>"
+if ! printf '%s' "$size_guide_markup" | grep -Fq '<h1 class="entry-title">Как снять мерки</h1>' || ! printf '%s' "$home_markup" | grep -Fq "$footer_size_guide_link"; then
+	echo "  ✗ страница и ссылка в подвале не переименованы в «Как снять мерки»"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "страница и ссылка в подвале переименованы"
+fi
+
 # Страница бренда должна содержать актуальный манифест и его ключевые разделы.
 about_markup=$(curl -s -L "$BASE/about/")
 if ! printf '%s' "$about_markup" | grep -q 'не откладывает жизнь на потом' || ! printf '%s' "$about_markup" | grep -q 'НАША ФИЛОСОФИЯ' || ! printf '%s' "$about_markup" | grep -q 'МЫ ВСЕ ОДИНАКОВЫЕ В ОДНОМ'; then
@@ -81,11 +92,32 @@ else
 fi
 
 lookbook_markup=$(curl -s -L "$BASE/lookbook/")
-if ! printf '%s' "$lookbook_markup" | grep -q 'как ты создаешь свой стиль' || ! printf '%s' "$lookbook_markup" | grep -q 'следующая фотография здесь — твоя' || ! printf '%s' "$lookbook_markup" | grep -q '@CARPEDIEM'; then
+if ! printf '%s' "$lookbook_markup" | grep -q 'как ты создаешь свой стиль' || ! printf '%s' "$lookbook_markup" | grep -q 'следующая фотография здесь — твоя' || ! printf '%s' "$lookbook_markup" | grep -q '@carpediem.department' || ! printf '%s' "$lookbook_markup" | grep -q 'Становись частью нашей с тобой истории.'; then
 	echo "  ✗ на странице LOOKBOOK нет актуального текста сообщества"
 	FAILED=1
 else
 	printf '  ✓ %-46s\n' "текст страницы LOOKBOOK обновлён"
+fi
+
+# Главная подборка должна быть компактной: только фото, название и цена.
+selection_markup=$(curl -s -L "$BASE/")
+if ! printf '%s' "$selection_markup" | grep -q 'home-selection' || ! printf '%s' "$selection_markup" | grep -q 'woocommerce-loop-product__title' || ! printf '%s' "$selection_markup" | grep -q 'class="price"' || printf '%s' "$selection_markup" | grep -q 'loop-card__cat\|loop-sizes\|loop-buy\|loop-favorite'; then
+	echo "  ✗ популярные товары содержат лишние элементы"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "популярные товары показывают фото, название и цену"
+fi
+
+# Отдельная страница коллекций и пункт верхнего меню ведут к тем же категориям.
+collections_markup=$(curl -s -L "$BASE/collections/")
+if ! printf '%s' "$collections_markup" | grep -q 'collections-page' || ! printf '%s' "$collections_markup" | grep -q 'cat-card'; then
+	echo "  ✗ на странице коллекций нет карточек категорий"
+	FAILED=1
+elif ! printf '%s' "$collections_markup" | grep -Fq "${BASE}/collections/"; then
+	echo "  ✗ пункт верхнего меню не ведёт на страницу коллекций"
+	FAILED=1
+else
+	printf '  ✓ %-46s\n' "страница коллекций и ссылка меню работают"
 fi
 
 # Каталог не должен опустеть: проверяем, что карточки на месте.
@@ -121,6 +153,12 @@ elif printf '%s' "$product_markup" | grep -qE 'one-click|quick_order'; then
 elif printf '%s' "$product_markup" | grep -qE 'loop-buy|loop-sizes|loop-favorite|loop-card__cat'; then
 	echo "  ✗ в рекомендациях товара остались лишние действия"
 	FAILED=1
+elif ! printf '%s' "$product_markup" | grep -Fq "class=\"size-guide-link\" href=\"${BASE}/size-guide/\" target=\"_blank\" rel=\"noopener\">Как снять мерки"; then
+	echo "  ✗ в карточке товара нет ссылки «Как снять мерки» в новой вкладке"
+	FAILED=1
+elif [[ "$product_markup" != *'size-table__note'*'size-guide-link'* ]]; then
+	echo "  ✗ ссылка «Как снять мерки» расположена не под таблицей размеров"
+	FAILED=1
 else
 	printf '  ✓ %-46s\n' "карточка товара и рекомендации упрощены"
 fi
@@ -143,13 +181,13 @@ else
 	printf '  ✓ %-46s\n' "философия бренда перед подвалом"
 fi
 
-# Главная использует новые монограмму, металлический логотип и кресты 01/08.
+# Главная использует фотоподборку, металлический логотип и кресты 01/08.
 branding_markup=$(curl -s -L "$BASE/")
-if ! printf '%s' "$branding_markup" | grep -q 'favicon.png' || ! printf '%s' "$branding_markup" | grep -q 'hero__sigil' || ! printf '%s' "$branding_markup" | grep -q 'brand-monogram-line.png' || ! printf '%s' "$branding_markup" | grep -q 'brand-logo-metallic.png' || ! printf '%s' "$branding_markup" | grep -q 'marquee__cross--classic' || ! printf '%s' "$branding_markup" | grep -q 'marquee__cross--massive'; then
-	echo "  ✗ новые брендовые знаки отображаются не полностью"
+if ! printf '%s' "$branding_markup" | grep -q 'favicon.png' || ! printf '%s' "$branding_markup" | grep -q 'hero-gallery' || ! printf '%s' "$branding_markup" | grep -q 'hero-gallery/garage.jpg' || ! printf '%s' "$branding_markup" | grep -q 'brand-monogram-line.png' || ! printf '%s' "$branding_markup" | grep -q 'brand-logo-metallic.png' || ! printf '%s' "$branding_markup" | grep -q 'marquee__cross--classic' || ! printf '%s' "$branding_markup" | grep -q 'marquee__cross--massive' || ! printf '%s' "$branding_markup" | grep -q 'site-header__home-logo' || [ "$(printf '%s' "$branding_markup" | grep -o 'announcement__cross brand-cross brand-cross--classic' | wc -l | tr -d '[:space:]')" -ne 2 ]; then
+	echo "  ✗ шапка, фотоподборка и брендовые знаки отображаются не полностью"
 	FAILED=1
 else
-	printf '  ✓ %-46s\n' "монограмма, логотип и кресты 01/08 подключены"
+	printf '  ✓ %-46s\n' "шапка, фотоподборка, логотип и кресты подключены"
 fi
 
 # На гостевой странице аккаунта доступны обе операции, но показывается только выбранная форма.

@@ -58,6 +58,84 @@
 	}
 } )();
 
+/* Первый экран: фотоподборка листается автоматически, свайп остаётся нативным scroll-snap. */
+( function () {
+	'use strict';
+
+	document.querySelectorAll( '.js-hero-gallery' ).forEach( function ( gallery ) {
+		var track = gallery.querySelector( '.js-hero-gallery-track' );
+		var autoplayTimer;
+		var reducedMotion = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+		if ( ! track ) {
+			return;
+		}
+
+		function move( direction ) {
+			var maxScroll = track.scrollWidth - track.clientWidth;
+			var nextScroll = track.scrollLeft + direction * track.clientWidth;
+
+			if ( direction > 0 && nextScroll >= maxScroll - 1 ) {
+				nextScroll = 0;
+			} else if ( direction < 0 && nextScroll <= 1 ) {
+				nextScroll = maxScroll;
+			}
+
+			track.scrollTo( { left: nextScroll, behavior: 'smooth' } );
+		}
+
+		function stopAutoplay() {
+			if ( autoplayTimer ) {
+				window.clearInterval( autoplayTimer );
+				autoplayTimer = undefined;
+			}
+		}
+
+		function startAutoplay() {
+			if ( reducedMotion || document.hidden || track.scrollWidth <= track.clientWidth ) {
+				return;
+			}
+
+			stopAutoplay();
+			autoplayTimer = window.setInterval( function () {
+				move( 1 );
+		}, 2500 );
+		}
+
+		gallery.querySelectorAll( '[data-hero-gallery-direction]' ).forEach( function ( button ) {
+			button.addEventListener( 'click', function () {
+				stopAutoplay();
+				move( Number( button.dataset.heroGalleryDirection ) );
+				startAutoplay();
+			} );
+		} );
+
+		track.addEventListener( 'keydown', function ( event ) {
+			if ( event.key === 'ArrowLeft' || event.key === 'ArrowRight' ) {
+				event.preventDefault();
+				move( event.key === 'ArrowLeft' ? -1 : 1 );
+			}
+		} );
+
+		gallery.addEventListener( 'mouseenter', stopAutoplay );
+		gallery.addEventListener( 'mouseleave', startAutoplay );
+		gallery.addEventListener( 'focusin', stopAutoplay );
+		gallery.addEventListener( 'focusout', function ( event ) {
+			if ( ! gallery.contains( event.relatedTarget ) ) {
+				startAutoplay();
+			}
+		} );
+		document.addEventListener( 'visibilitychange', function () {
+			if ( document.hidden ) {
+				stopAutoplay();
+			} else {
+				startAutoplay();
+			}
+		} );
+
+		startAutoplay();
+	} );
+} )();
+
 /* В личном кабинете показываем только одну форму: вход или регистрацию. */
 ( function () {
 	'use strict';
@@ -392,49 +470,6 @@
 			window.jQuery( document.body ).trigger( 'wc_fragment_refresh' );
 		} );
 	}
-} )();
-
-/* Переключатель светлой и тёмной темы. Выбор запоминается в localStorage. */
-( function () {
-	'use strict';
-
-	var buttons = document.querySelectorAll( '.js-theme-toggle' );
-	if ( ! buttons.length ) {
-		return;
-	}
-
-	var root = document.documentElement;
-
-	function apply( theme ) {
-		root.setAttribute( 'data-theme', theme );
-		buttons.forEach( function ( btn ) {
-			var darkLabel = btn.getAttribute( 'data-dark-label' ) || 'Демон';
-			var lightLabel = btn.getAttribute( 'data-light-label' ) || 'Ангел';
-			var currentLabel = theme === 'light' ? lightLabel : darkLabel;
-			var nextLabel = theme === 'light' ? darkLabel : lightLabel;
-			var status = btn.querySelector( '.js-theme-status' );
-
-			btn.setAttribute( 'aria-checked', String( theme === 'light' ) );
-			btn.setAttribute( 'aria-label', 'Включить тему «' + nextLabel + '»' );
-			btn.setAttribute( 'title', currentLabel + ' · переключить на «' + nextLabel + '»' );
-			if ( status ) {
-				status.textContent = 'Тема «' + currentLabel + '». Включить тему «' + nextLabel + '»';
-			}
-		} );
-		try {
-			localStorage.setItem( 'cd-theme', theme );
-		} catch ( e ) {}
-	}
-
-	apply( root.getAttribute( 'data-theme' ) === 'light' ? 'light' : 'dark' );
-
-	buttons.forEach( function ( btn ) {
-		btn.addEventListener( 'click', function () {
-			root.classList.add( 'theme-changing' );
-			apply( root.getAttribute( 'data-theme' ) === 'light' ? 'dark' : 'light' );
-			window.setTimeout( function () { root.classList.remove( 'theme-changing' ); }, 360 );
-		} );
-	} );
 } )();
 
 /* Избранное: список id в localStorage этого браузера. */

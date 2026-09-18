@@ -62,6 +62,7 @@ $density     = array_filter( (array) $density, fn( $v ) => '—' !== $v );
 						</table>
 					</div>
 					<p class="size-table__note"><?php echo esc_html( carpediem_setting( 'product_size_note' ) ); ?></p>
+					<a class="size-guide-link" href="<?php echo esc_url( home_url( '/size-guide/' ) ); ?>" target="_blank" rel="noopener"><?php echo esc_html( carpediem_setting( 'product_size_guide_label' ) ); ?> <span aria-hidden="true">↗</span><span class="screen-reader-text">Откроется в новой вкладке</span></a>
 				</div>
 			</details>
 		<?php endif; ?>

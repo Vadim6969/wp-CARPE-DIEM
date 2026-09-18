@@ -253,6 +253,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .site-header__home-logo:hover { background: var(--surface-soft); }
 .site-header__home-logo:active { transform: scale(.94); }
 .site-header__home-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* На широком экране герб и навигация живут в одной оси, а не в двух строках. */
+@media (min-width: 1100px) {
+	:root { --header-h: 92px; }
+	.site-header__inner { grid-template-columns: 1fr 60px 1fr; }
+	.site-nav,
+	.site-header__home-logo,
+	.site-header__actions { grid-row: 1; }
+	.site-header__home-logo { width: 60px; height: 60px; }
+}
+
 .hlink, .hsearch > summary {
 	display: inline-flex;
 	align-items: center;

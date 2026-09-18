@@ -253,13 +253,6 @@ function carpediem_commerce_brand() {
 	<?php
 }
 
-function carpediem_product_brand_hero() {
-	echo '<header class="commerce-page-hero commerce-page-hero--product">';
-	carpediem_commerce_brand();
-	echo '</header>';
-}
-add_action( 'woocommerce_before_single_product', 'carpediem_product_brand_hero', 5 );
-
 // Якорь для кнопки «Купить» из каталога — сразу к выбору параметров и действиям.
 add_action( 'woocommerce_before_add_to_cart_form', function () {
 	echo '<span id="product-buy" class="product-buy-anchor" aria-hidden="true"></span>';

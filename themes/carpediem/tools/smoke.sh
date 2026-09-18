@@ -138,11 +138,11 @@ else
 	printf '  ✓ %-46s\n' "каталог без фильтров и лишних действий"
 fi
 
-# Карточка товара объясняет выбор вариации, не предлагает заказ по телефону и упрощает рекомендации.
+# Карточка товара не повторяет брендовый герб, объясняет выбор вариации и упрощает рекомендации.
 product_markup=$(curl -s -L "$BASE/product/split-camo-thermochromic/")
 open_info_count=$(printf '%s' "$product_markup" | grep -oE '<details class="info-col"[^>]* open' | wc -l | tr -d ' ')
-if ! printf '%s' "$product_markup" | grep -q 'commerce-page-hero--product' || ! printf '%s' "$product_markup" | grep -q 'product-selection-note'; then
-	echo "  ✗ на карточке товара нет брендовой плашки или подсказки выбора"
+if printf '%s' "$product_markup" | grep -q 'commerce-page-hero--product' || ! printf '%s' "$product_markup" | grep -q 'product-selection-note'; then
+	echo "  ✗ на карточке товара есть лишняя брендовая плашка или нет подсказки выбора"
 	FAILED=1
 elif [ "$open_info_count" -lt 3 ]; then
 	echo "  ✗ информационные блоки товара не открыты по умолчанию"
@@ -160,7 +160,7 @@ elif [[ "$product_markup" != *'size-table__note'*'size-guide-link'* ]]; then
 	echo "  ✗ ссылка «Как снять мерки» расположена не под таблицей размеров"
 	FAILED=1
 else
-	printf '  ✓ %-46s\n' "карточка товара и рекомендации упрощены"
+	printf '  ✓ %-46s\n' "карточка товара без двойного брендинга и рекомендации упрощены"
 fi
 
 # Заголовок корзины использует ту же брендовую атмосферную плашку.
